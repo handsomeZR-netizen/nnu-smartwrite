@@ -3,33 +3,33 @@
   "questions": [
     {
       "id": "q001",
-      "type": "translation",
-      "title": "2024考研英语一翻译真题 - 成人教育",
-      "directions": "Translate the underlined sentence into Chinese.",
+      "type": "writing",
+      "title": "2024考研英语一写作真题 - 成人教育",
+      "directions": "Write a sentence about the benefits of adult education and lifelong learning.",
       "essayContext": "Adult education is a growing field in modern society. It provides opportunities for people who have left formal schooling to continue their learning journey. Many adults return to education to improve their career prospects or pursue personal interests. The flexibility of adult education programs makes them accessible to working professionals. Research shows that lifelong learning contributes significantly to personal development and social progress.",
       "difficulty": "medium"
     },
     {
       "id": "q002",
-      "type": "translation",
-      "title": "2023考研英语二翻译真题 - 社会责任",
-      "directions": "Translate the underlined sentence into Chinese.",
+      "type": "writing",
+      "title": "2023考研英语二写作真题 - 社会责任",
+      "directions": "Write a sentence about corporate social responsibility and its importance in modern business.",
       "essayContext": "In today's interconnected world, social responsibility has become increasingly important. Companies are expected to consider their impact on society and the environment. Many organizations now recognize that social responsibility is not just about charity, but about integrating ethical practices into their core business operations. This shift reflects a broader understanding that businesses have obligations beyond profit-making.",
       "difficulty": "medium"
     },
     {
       "id": "q003",
-      "type": "translation",
-      "title": "2022考研英语一翻译真题 - 科技发展",
-      "directions": "Translate the underlined sentence into Chinese.",
-      "essayContext": "The rapid advancement of technology has transformed every aspect of modern life. From communication to healthcare, technological innovations continue to reshape how we live and work. However, this progress also brings challenges, including concerns about privacy, job displacement, and digital inequality. It is common that people feel overwhelmed by the pace of technological change. Balancing innovation with ethical considerations remains a critical challenge for society.",
+      "type": "writing",
+      "title": "2022考研英语一写作真题 - 科技发展",
+      "directions": "Write a sentence about the challenges of balancing technological innovation with ethical considerations.",
+      "essayContext": "The rapid advancement of technology has transformed every aspect of modern life. From communication to healthcare, technological innovations continue to reshape how we live and work. However, this progress also brings challenges, including concerns about privacy, job displacement, and digital inequality. Many people feel overwhelmed by the pace of technological change. Balancing innovation with ethical considerations remains a critical challenge for society.",
       "difficulty": "hard"
     },
     {
       "id": "q004",
-      "type": "translation",
-      "title": "2021考研英语二翻译真题 - 环境保护",
-      "directions": "Translate the underlined sentence into Chinese.",
+      "type": "writing",
+      "title": "2021考研英语二写作真题 - 环境保护",
+      "directions": "Write a sentence about the importance of sustainable practices in protecting the environment.",
       "essayContext": "Environmental protection has emerged as one of the most pressing issues of our time. Climate change, pollution, and biodiversity loss threaten the planet's ecosystems. Governments and individuals alike must take action to reduce their environmental footprint. Sustainable practices in agriculture, industry, and daily life are essential for preserving natural resources for future generations.",
       "difficulty": "medium"
     },
@@ -67,8 +67,7 @@
     }
   ],
   "categories": {
-    "translation": ["q001", "q002", "q003", "q004"],
-    "writing": ["q005", "q006", "q007", "q008"]
+    "writing": ["q001", "q002", "q003", "q004", "q005", "q006", "q007", "q008"]
   },
   "metadata": {
     "totalQuestions": 8,

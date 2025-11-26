@@ -368,7 +368,8 @@ export function EvaluationForm({
         </div>
       )}
 
-      <div className="relative">
+      <div className="space-y-3">
+        {/* 评估选中句子按钮 */}
         <Button
           type="button"
           onClick={handleEvaluateSelection}
@@ -394,6 +395,55 @@ export function EvaluationForm({
               AI 智能评估选中句子
             </>
           )}
+        </Button>
+
+        {/* 评价全文按钮 */}
+        <Button
+          type="button"
+          onClick={async () => {
+            if (!formData.essayContext || !formData.directions) return;
+            
+            setRateLimitError(null);
+            if (!evaluationRateLimiter.canMakeRequest()) {
+              const waitTime = Math.ceil(evaluationRateLimiter.getTimeUntilNextRequest() / 1000);
+              setRateLimitError(`请求过于频繁，请等待 ${waitTime} 秒后再试`);
+              return;
+            }
+            
+            const evaluationData = {
+              ...formData,
+              studentSentence: formData.essayContext,
+            };
+            
+            setTouched({ directions: true, essayContext: true, studentSentence: true, evaluationType: false });
+            
+            try {
+              EvaluationInputSchema.parse(evaluationData);
+              setErrors([]);
+              evaluationRateLimiter.recordRequest();
+              await onSubmit(evaluationData);
+            } catch (error) {
+              if (error instanceof ZodError) {
+                const validationErrors: ValidationError[] = error.issues.map((err) => ({
+                  field: String(err.path[0]),
+                  message: err.message,
+                }));
+                setErrors(validationErrors);
+              }
+            }
+          }}
+          disabled={isLoading || !formData.essayContext || !formData.directions}
+          className={cn(
+            "w-full py-4 rounded-lg font-bold text-white text-base shadow-lg flex items-center justify-center gap-2 transition-all",
+            isLoading 
+              ? "bg-gray-400 cursor-not-allowed" 
+              : formData.essayContext && formData.directions
+              ? "bg-gradient-to-r from-nnu-green to-nnu-jade hover:shadow-xl"
+              : "bg-gray-300 cursor-not-allowed"
+          )}
+        >
+          <FileText className="w-5 h-5" />
+          AI 智能评价全文
         </Button>
       </div>
     </form>

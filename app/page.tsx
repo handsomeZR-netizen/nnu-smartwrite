@@ -24,15 +24,15 @@ export default function Home() {
 
           {/* Main Title */}
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-            <span className="block">DeepSeek 赋能的</span>
-            <span className="block text-nnu-gold">上下文语义评价</span>
+            <span className="block">SmartWrite</span>
+            <span className="block text-nnu-gold">AI赋能下的写作辅导与评价平台</span>
           </h1>
 
           {/* Subtitle */}
           <p className="max-w-2xl mx-auto text-white/80 text-base md:text-lg mb-10 leading-relaxed">
-            区别于传统语法检查，我们理解语境。同义替换？逻辑连贯？文体风格？
+            专为南京师范大学非英语专业学生打造的，具备自动评分、多维诊断、个性化反馈等功能的在线写作测评系统原型，
             <br className="hidden md:block" />
-            NNU SmartWrite 都能像真人导师一样为您精准判分。
+            支持南京师范大学学生自主练习与教师数据追踪。
           </p>
 
           {/* CTA Button */}

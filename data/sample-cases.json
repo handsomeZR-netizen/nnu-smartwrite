@@ -3,26 +3,26 @@
   "samples": [
     {
       "id": "sample-001",
-      "title": "社会责任感 - 翻译题",
-      "directions": "Translate the underlined sentence. Pay attention to the concept of duty.",
-      "essayContext": "In modern society, every individual plays a role in the community structure. We are bound not just by laws, but by unwritten rules. All in all, a sense of social obligation is what a citizen cannot live without.",
-      "category": "translation",
+      "title": "社会责任感 - 写作题",
+      "directions": "Write a sentence about the importance of social responsibility in modern society. Consider how individuals contribute to their communities.",
+      "essayContext": "In modern society, every individual plays a role in the community structure. We are bound not just by laws, but by unwritten rules. Citizens have both rights and responsibilities that help maintain social harmony and progress.",
+      "category": "writing",
       "difficulty": "medium"
     },
     {
       "id": "sample-002",
-      "title": "科技与生活 - 翻译题",
-      "directions": "Translate the underlined sentence into Chinese.",
-      "essayContext": "Technology has revolutionized the way we communicate and work. Smartphones and the internet have made information accessible to billions of people worldwide. However, this digital transformation also brings challenges such as privacy concerns and digital addiction. It is essential that we find a balance between embracing innovation and maintaining our well-being.",
-      "category": "translation",
+      "title": "科技与生活 - 写作题",
+      "directions": "Write a sentence that expresses your view on balancing technology use with personal well-being.",
+      "essayContext": "Technology has revolutionized the way we communicate and work. Smartphones and the internet have made information accessible to billions of people worldwide. However, this digital transformation also brings challenges such as privacy concerns and digital addiction. Finding the right balance is crucial for our mental and physical health.",
+      "category": "writing",
       "difficulty": "medium"
     },
     {
       "id": "sample-003",
-      "title": "教育改革 - 翻译题",
-      "directions": "Translate the underlined sentence into Chinese.",
+      "title": "教育改革 - 写作题",
+      "directions": "Write a sentence about the impact of online learning on educational equality.",
       "essayContext": "The traditional education system is undergoing significant changes. With the rise of online learning platforms, students now have access to courses from top universities around the world. This democratization of education has the potential to reduce inequality and provide opportunities for lifelong learning. Nevertheless, the quality of online education varies greatly, and not all students have equal access to technology.",
-      "category": "translation",
+      "category": "writing",
       "difficulty": "hard"
     },
     {
@@ -43,10 +43,10 @@
     },
     {
       "id": "sample-006",
-      "title": "职业发展 - 翻译题",
-      "directions": "Translate the underlined sentence into Chinese.",
-      "essayContext": "Career development in the 21st century requires continuous learning and adaptation. The job market is constantly evolving due to technological advancements and changing economic conditions. Workers must be prepared to acquire new skills throughout their careers. Those who embrace lifelong learning are more likely to succeed in this dynamic environment.",
-      "category": "translation",
+      "title": "职业发展 - 写作题",
+      "directions": "Write a sentence about the importance of lifelong learning in career development.",
+      "essayContext": "Career development in the 21st century requires continuous learning and adaptation. The job market is constantly evolving due to technological advancements and changing economic conditions. Workers must be prepared to acquire new skills throughout their careers. Success in today's dynamic environment depends on one's willingness to learn and adapt.",
+      "category": "writing",
       "difficulty": "medium"
     },
     {
@@ -59,18 +59,18 @@
     },
     {
       "id": "sample-008",
-      "title": "人工智能伦理 - 翻译题",
-      "directions": "Translate the underlined sentence into Chinese.",
-      "essayContext": "Artificial intelligence is transforming industries and reshaping society at an unprecedented pace. From healthcare to transportation, AI systems are making decisions that affect millions of lives. As these technologies become more powerful, ethical considerations become increasingly important. We must ensure that AI development is guided by principles of fairness, transparency, and accountability.",
-      "category": "translation",
+      "title": "人工智能伦理 - 写作题",
+      "directions": "Write a sentence about the ethical principles that should guide AI development.",
+      "essayContext": "Artificial intelligence is transforming industries and reshaping society at an unprecedented pace. From healthcare to transportation, AI systems are making decisions that affect millions of lives. As these technologies become more powerful, ethical considerations become increasingly important. Responsible AI development requires careful attention to fairness, transparency, and accountability.",
+      "category": "writing",
       "difficulty": "hard"
     },
     {
       "id": "sample-009",
-      "title": "城市化进程 - 翻译题",
-      "directions": "Translate the underlined sentence into Chinese.",
+      "title": "城市化进程 - 写作题",
+      "directions": "Write a sentence about the challenges and opportunities of urbanization.",
       "essayContext": "Urbanization is one of the defining trends of the modern era. More than half of the world's population now lives in cities, and this proportion continues to grow. Urban areas offer economic opportunities, cultural diversity, and access to services. However, rapid urbanization also creates challenges such as overcrowding, pollution, and social inequality. Sustainable urban planning is crucial for creating livable cities.",
-      "category": "translation",
+      "category": "writing",
       "difficulty": "medium"
     },
     {
