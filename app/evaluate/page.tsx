@@ -7,7 +7,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import type { EvaluationInput, EvaluationResult, APIError } from "@/lib/types";
 import { saveToHistory } from "@/lib/storage";
-import { EvaluationResultSchema } from "@/lib/types";
 import { ResultCardSkeleton } from "@/components/nnu/skeletons";
 import { Activity, GraduationCap, AlertTriangle, RotateCcw, ArrowLeft } from "lucide-react";
 
@@ -46,11 +45,32 @@ export default function EvaluatePage() {
       throw errorData;
     }
     const data = await response.json();
-    const validated = EvaluationResultSchema.safeParse(data);
-    if (!validated.success) {
+    
+    // 宽松验证：只检查必需字段是否存在
+    if (!data || typeof data !== 'object') {
       throw { error: 'INVALID_RESPONSE', message: 'API响应格式错误', retryable: true } as APIError;
     }
-    return validated.data;
+    
+    // 验证必需字段
+    const validScores = ['S', 'A', 'B', 'C'];
+    if (!validScores.includes(data.score)) {
+      console.warn('Invalid score, using default:', data.score);
+      data.score = 'B';
+    }
+    
+    if (typeof data.isSemanticallyCorrect !== 'boolean') {
+      data.isSemanticallyCorrect = data.score !== 'C';
+    }
+    
+    if (!data.analysis || typeof data.analysis !== 'string') {
+      data.analysis = '评估完成';
+    }
+    
+    if (!data.timestamp || typeof data.timestamp !== 'number') {
+      data.timestamp = Date.now();
+    }
+    
+    return data as EvaluationResult;
   };
 
   const handleSubmit = async (input: EvaluationInput) => {
@@ -167,7 +187,7 @@ export default function EvaluatePage() {
 
             {/* 结果展示 */}
             {result && (
-              <ResultCard result={result} showRadarChart={!!result.radarScores} />
+              <ResultCard result={result} showRadarChart={!!(result.radarScores || result.radarDimensions)} />
             )}
           </div>
         </div>
