@@ -6,9 +6,6 @@ const nextConfig: NextConfig = {
     root: process.cwd(),
   },
   
-  // Output configuration for Netlify deployment
-  output: 'standalone',
-  
   // Enable image optimization
   images: {
     formats: ['image/avif', 'image/webp'],

@@ -4,23 +4,9 @@
   command = "npm run build"
   publish = ".next"
 
-# Redirect API routes to serverless functions
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/:splat"
-  status = 200
-
-# SPA fallback for client-side routing
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-  conditions = {Role = ["admin"]}
-
-# Functions configuration
-[functions]
-  node_bundler = "esbuild"
-  directory = ".netlify/functions"
+# Next.js Plugin - Essential for Next.js on Netlify
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
 
 # Security headers
 [[headers]]
