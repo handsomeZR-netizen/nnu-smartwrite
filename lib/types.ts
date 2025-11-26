@@ -1,12 +1,18 @@
 import { z } from 'zod';
 
 /**
+ * 评估类型：翻译题 vs 写作题
+ */
+export type EvaluationType = 'translation' | 'writing';
+
+/**
  * 评估输入数据结构
  */
 export interface EvaluationInput {
   directions: string;      // 题目要求
   essayContext: string;    // 文章语境
   studentSentence: string; // 学生答案
+  evaluationType?: EvaluationType; // 可选：评估类型（默认自动检测）
 }
 
 /**
@@ -16,22 +22,47 @@ export const EvaluationInputSchema = z.object({
   directions: z.string().trim().min(1, '题目要求不能为空').max(500, '题目要求不能超过500字符'),
   essayContext: z.string().trim().min(1, '文章语境不能为空').max(2000, '文章语境不能超过2000字符'),
   studentSentence: z.string().trim().min(1, '学生答案不能为空').max(1000, '学生答案不能超过1000字符'),
+  evaluationType: z.enum(['translation', 'writing']).optional(),
 });
 
 /**
- * 评估结果数据结构
+ * 结构化分析反馈
+ */
+export interface AnalysisBreakdown {
+  strengths: string[];      // 优点列表
+  weaknesses: string[];     // 缺点列表
+  contextMatch: string;     // 语境契合度描述
+}
+
+/**
+ * 动态雷达图维度（根据评估类型）
+ */
+export interface RadarDimensions {
+  dim1: number;             // 维度1分数 (0-100)
+  dim2: number;             // 维度2分数 (0-100)
+  dim3: number;             // 维度3分数 (0-100)
+  dim4: number;             // 维度4分数 (0-100)
+  labels: [string, string, string, string]; // 维度标签
+}
+
+/**
+ * 评估结果数据结构（增强版）
  */
 export interface EvaluationResult {
   score: 'S' | 'A' | 'B' | 'C';           // 等级评分
   isSemanticallyCorrect: boolean;         // 语义正确性标志
-  analysis: string;                       // 详细分析文本
+  analysis: string;                       // 详细分析文本（向后兼容）
+  analysisBreakdown?: AnalysisBreakdown;  // 结构化分析（新增）
   polishedVersion: string;                // 润色建议
-  radarScores?: {                         // 可选：雷达图数据
+  radarScores?: {                         // 可选：雷达图数据（传统格式）
     vocabulary: number;    // 词汇 (0-100)
     grammar: number;       // 语法 (0-100)
     coherence: number;     // 连贯性 (0-100)
     structure: number;     // 结构 (0-100)
   };
+  radarDimensions?: RadarDimensions;      // 可选：动态雷达图维度（新增）
+  evaluationType?: EvaluationType;        // 评估类型
+  reasoningProcess?: string;              // 推理过程（来自deepseek-reasoner）
   timestamp: number;                      // 评估时间戳
 }
 

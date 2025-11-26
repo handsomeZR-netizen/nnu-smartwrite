@@ -19,7 +19,7 @@ export default function Home() {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm mb-8 bg-white/10 backdrop-blur-sm border border-white/20">
             <Sparkles className="w-4 h-4 text-nnu-gold" />
-            <span className="text-white/90">Powered by DeepSeek V3 API</span>
+            <span className="text-white/90">Powered by DeepSeek-Reasoner AI</span>
           </div>
 
           {/* Main Title */}
@@ -71,10 +71,10 @@ export default function Home() {
                 <BarChart3 className="w-7 h-7 text-nnu-green" />
               </div>
               <h3 className="text-xl font-semibold text-nnu-green mb-3">
-                多维度反馈
+                结构化反馈
               </h3>
               <p className="text-gray-600 leading-relaxed">
-                提供等级评分、详细分析、润色建议和雷达图可视化，全方位提升写作能力
+                优点/缺点清单、AI 推理过程、动态雷达图、量化评分标准，让改进有的放矢
               </p>
             </CardContent>
           </Card>
@@ -93,6 +93,82 @@ export default function Home() {
               </p>
             </CardContent>
           </Card>
+        </div>
+      </section>
+
+      {/* AI Features Highlight Section */}
+      <section className="py-16 px-4 bg-white">
+        <div className="container mx-auto max-w-5xl">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-nnu-green mb-4">
+              🚀 全新 AI 能力升级
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              基于 DeepSeek-Reasoner 模型，我们实现了更智能、更透明、更精准的评估体验
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Feature 1 */}
+            <div className="p-6 rounded-xl border-2 border-nnu-green/20 hover:border-nnu-green/40 transition-all">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-lg bg-nnu-green/10 flex items-center justify-center shrink-0">
+                  <span className="text-xl">🧠</span>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-nnu-green mb-2">AI 推理过程可视化</h3>
+                  <p className="text-sm text-gray-600">
+                    查看 AI 如何思考和评分，让评估过程更透明、更可信
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Feature 2 */}
+            <div className="p-6 rounded-xl border-2 border-nnu-green/20 hover:border-nnu-green/40 transition-all">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-lg bg-nnu-green/10 flex items-center justify-center shrink-0">
+                  <span className="text-xl">🎯</span>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-nnu-green mb-2">智能任务识别</h3>
+                  <p className="text-sm text-gray-600">
+                    自动区分翻译题和写作题，应用不同评估标准（信达雅 vs 词汇逻辑结构）
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Feature 3 */}
+            <div className="p-6 rounded-xl border-2 border-nnu-green/20 hover:border-nnu-green/40 transition-all">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-lg bg-nnu-green/10 flex items-center justify-center shrink-0">
+                  <span className="text-xl">📊</span>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-nnu-green mb-2">动态雷达图维度</h3>
+                  <p className="text-sm text-gray-600">
+                    根据题目类型显示不同维度，点击交互查看详细分析
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Feature 4 */}
+            <div className="p-6 rounded-xl border-2 border-nnu-green/20 hover:border-nnu-green/40 transition-all">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-lg bg-nnu-green/10 flex items-center justify-center shrink-0">
+                  <span className="text-xl">✨</span>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-nnu-green mb-2">结构化反馈清单</h3>
+                  <p className="text-sm text-gray-600">
+                    优点、缺点、语境契合度分类展示，改进方向一目了然
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 

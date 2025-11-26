@@ -51,14 +51,11 @@ export function EvaluationForm({
   }, []);
 
   const [errors, setErrors] = React.useState<ValidationError[]>([]);
-  const [touched, setTouched] = React.useState<{
-    directions: boolean;
-    essayContext: boolean;
-    studentSentence: boolean;
-  }>({
+  const [touched, setTouched] = React.useState<Record<keyof EvaluationInput, boolean>>({
     directions: false,
     essayContext: false,
     studentSentence: false,
+    evaluationType: false,
   });
   const [rateLimitError, setRateLimitError] = React.useState<string | null>(null);
 
@@ -99,6 +96,10 @@ export function EvaluationForm({
   }, [formData, saveDraft]);
 
   const validateField = (field: keyof EvaluationInput, value: string): string | null => {
+    // Skip validation for optional evaluationType field
+    if (field === 'evaluationType') {
+      return null;
+    }
     try {
       EvaluationInputSchema.shape[field].parse(value);
       return null;
@@ -129,7 +130,8 @@ export function EvaluationForm({
 
   const handleFieldChange = (field: keyof EvaluationInput, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-    if (touched[field]) {
+    // Only validate required fields
+    if (field !== 'evaluationType' && touched[field as 'directions' | 'essayContext' | 'studentSentence']) {
       const error = validateField(field, value);
       setErrors((prev) => {
         const filtered = prev.filter((e) => e.field !== field);
@@ -143,12 +145,15 @@ export function EvaluationForm({
 
   const handleFieldBlur = (field: keyof EvaluationInput) => {
     setTouched((prev) => ({ ...prev, [field]: true }));
-    const error = validateField(field, formData[field]);
-    if (error) {
-      setErrors((prev) => {
-        const filtered = prev.filter((e) => e.field !== field);
-        return [...filtered, { field, message: error }];
-      });
+    const value = formData[field];
+    if (value !== undefined) {
+      const error = validateField(field, value);
+      if (error) {
+        setErrors((prev) => {
+          const filtered = prev.filter((e) => e.field !== field);
+          return [...filtered, { field, message: error }];
+        });
+      }
     }
   };
 
@@ -178,7 +183,7 @@ export function EvaluationForm({
       studentSentence: selection,
     };
     
-    setTouched({ directions: true, essayContext: true, studentSentence: true });
+    setTouched({ directions: true, essayContext: true, studentSentence: true, evaluationType: false });
     
     try {
       EvaluationInputSchema.parse(evaluationData);
@@ -204,7 +209,7 @@ export function EvaluationForm({
       setRateLimitError(`请求过于频繁，请等待 ${waitTime} 秒后再试`);
       return;
     }
-    setTouched({ directions: true, essayContext: true, studentSentence: true });
+    setTouched({ directions: true, essayContext: true, studentSentence: true, evaluationType: false });
     if (!validateForm()) return;
     evaluationRateLimiter.recordRequest();
     await onSubmit(formData);
@@ -218,7 +223,7 @@ export function EvaluationForm({
       studentSentence: sample.studentSentence,
     });
     setErrors([]);
-    setTouched({ directions: false, essayContext: false, studentSentence: false });
+    setTouched({ directions: false, essayContext: false, studentSentence: false, evaluationType: false });
   };
 
   const handleNextSample = () => {
@@ -231,7 +236,7 @@ export function EvaluationForm({
       studentSentence: sample.studentSentence,
     });
     setErrors([]);
-    setTouched({ directions: false, essayContext: false, studentSentence: false });
+    setTouched({ directions: false, essayContext: false, studentSentence: false, evaluationType: false });
   };
 
   const getFieldError = (field: keyof EvaluationInput): string | undefined => {

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { EvaluationInputSchema, type EvaluationResult } from '@/lib/types';
-import { EVALUATION_SYSTEM_PROMPT, createEvaluationPrompt } from '@/lib/ai-prompt';
+import { EvaluationInputSchema, type EvaluationResult, type EvaluationType } from '@/lib/types';
+import { buildSystemPrompt, createEvaluationPrompt, detectEvaluationType } from '@/lib/ai-prompt';
 import { sanitizeEvaluationInput } from '@/lib/utils';
 
 /**
@@ -32,6 +32,7 @@ interface DeepSeekResponse {
   choices: Array<{
     message: {
       content: string;
+      reasoning_content?: string; // deepseek-reasoner 专用字段
     };
     finish_reason: string;
   }>;
@@ -41,16 +42,21 @@ interface DeepSeekStreamChunk {
   choices: Array<{
     delta: {
       content?: string;
+      reasoning_content?: string; // deepseek-reasoner 专用字段
     };
     finish_reason: string | null;
   }>;
 }
 
 /**
- * 解析AI返回的JSON响应
- * 将snake_case字段转换为camelCase
+ * 解析AI返回的JSON响应（增强版）
+ * 将snake_case字段转换为camelCase，支持新的结构化字段
  */
-function parseAIResponse(content: string): Omit<EvaluationResult, 'timestamp'> {
+function parseAIResponse(
+  content: string, 
+  reasoningContent?: string,
+  evaluationType?: EvaluationType
+): Omit<EvaluationResult, 'timestamp'> {
   try {
     // 尝试提取 JSON 内容（处理可能的 markdown 代码块）
     let jsonContent = content.trim();
@@ -72,6 +78,11 @@ function parseAIResponse(content: string): Omit<EvaluationResult, 'timestamp'> {
       score: parsed.score,
       isSemanticallyCorrect: parsed.is_semantically_correct,
       analysis: parsed.analysis,
+      analysisBreakdown: parsed.analysis_breakdown ? {
+        strengths: parsed.analysis_breakdown.strengths || [],
+        weaknesses: parsed.analysis_breakdown.weaknesses || [],
+        contextMatch: parsed.analysis_breakdown.context_match || '',
+      } : undefined,
       polishedVersion: parsed.polished_version,
       radarScores: parsed.radar_scores ? {
         vocabulary: parsed.radar_scores.vocabulary,
@@ -79,6 +90,15 @@ function parseAIResponse(content: string): Omit<EvaluationResult, 'timestamp'> {
         coherence: parsed.radar_scores.coherence,
         structure: parsed.radar_scores.structure,
       } : undefined,
+      radarDimensions: parsed.radar_dimensions ? {
+        dim1: parsed.radar_dimensions.dim1,
+        dim2: parsed.radar_dimensions.dim2,
+        dim3: parsed.radar_dimensions.dim3,
+        dim4: parsed.radar_dimensions.dim4,
+        labels: parsed.radar_dimensions.labels,
+      } : undefined,
+      evaluationType,
+      reasoningProcess: reasoningContent, // 来自 deepseek-reasoner 的推理过程
     };
   } catch (error) {
     console.error('Failed to parse AI response:', content);
@@ -88,7 +108,7 @@ function parseAIResponse(content: string): Omit<EvaluationResult, 'timestamp'> {
 }
 
 /**
- * 调用DeepSeek API（非流式）
+ * 调用DeepSeek API（非流式，支持 deepseek-reasoner）
  * 支持自定义API配置
  */
 async function callDeepSeekAPI(
@@ -97,7 +117,7 @@ async function callDeepSeekAPI(
   customAPIEndpoint?: string,
   customAPIModel?: string,
   retryCount = 0
-): Promise<string> {
+): Promise<{ content: string; reasoningContent?: string }> {
   // 优先使用自定义API，否则使用环境变量
   const apiKey = customAPIKey || process.env.DEEPSEEK_API_KEY;
   
@@ -110,13 +130,15 @@ async function callDeepSeekAPI(
   const endpoint = baseEndpoint.includes('/chat/completions') 
     ? baseEndpoint 
     : `${baseEndpoint}/chat/completions`;
-  const model = customAPIModel || 'deepseek-chat';
+  
+  // 默认使用 deepseek-reasoner 模型以获得更好的推理能力
+  const model = customAPIModel || 'deepseek-reasoner';
 
   const requestBody: DeepSeekRequest = {
     model,
     messages,
     temperature: 0.3,
-    max_tokens: 1000,
+    max_tokens: 2000, // 增加 token 限制以支持推理过程
     stream: false,
   };
 
@@ -154,7 +176,10 @@ async function callDeepSeekAPI(
       throw new Error('No response from DeepSeek API');
     }
 
-    return data.choices[0].message.content;
+    return {
+      content: data.choices[0].message.content,
+      reasoningContent: data.choices[0].message.reasoning_content, // deepseek-reasoner 的推理过程
+    };
   } catch (error) {
     if (error instanceof Error) {
       throw error;
@@ -216,17 +241,27 @@ export async function POST(request: NextRequest) {
     // 进一步清理输入（移除多余空白等）
     const cleanedInput = sanitizeEvaluationInput(input);
     
+    // 检测或使用指定的评估类型
+    const evaluationType = cleanedInput.evaluationType || detectEvaluationType(cleanedInput.directions);
+    
+    // 构建动态系统提示词
+    const systemPrompt = buildSystemPrompt(evaluationType);
+    
     // 构建消息
     const messages: DeepSeekMessage[] = [
-      { role: 'system', content: EVALUATION_SYSTEM_PROMPT },
+      { role: 'system', content: systemPrompt },
       { role: 'user', content: createEvaluationPrompt(cleanedInput) },
     ];
     
-    // 调用DeepSeek API（支持自定义配置）
+    // 调用DeepSeek API（支持自定义配置，默认使用 deepseek-reasoner）
     const aiResponse = await callDeepSeekAPI(messages, customAPIKey, customAPIEndpoint, customAPIModel);
     
-    // 解析AI响应
-    const parsedResponse = parseAIResponse(aiResponse);
+    // 解析AI响应（包含推理过程）
+    const parsedResponse = parseAIResponse(
+      aiResponse.content, 
+      aiResponse.reasoningContent,
+      evaluationType
+    );
     
     // 添加时间戳
     const result: EvaluationResult = {
