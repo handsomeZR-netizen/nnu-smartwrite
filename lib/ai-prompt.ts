@@ -1,106 +1,119 @@
-import type { EvaluationInput, EvaluationType } from './types';
+import type { EvaluationInput, EvaluationType, EvaluationMode } from './types';
 
 /**
- * 基础系统提示词（通用部分）
+ * 基础角色设定（强制中文分析 + 英文润色）
  */
-const BASE_SYSTEM_PROMPT = `You are a rigorous but fair English professor at Nanjing Normal University (南京师范大学). Your task is to evaluate a student's English sentence based on specific directions and essay context.
+const BASE_ROLE = `You are an English writing and translation expert at Nanjing Normal University (南京师范大学). Your task is to evaluate students' English output.
 
-**CRITICAL RULES:**
+你是南京师范大学的英语写作与翻译评审专家。你的任务是评估学生的英语产出。
 
-1. **Accept Synonyms and Logical Equivalents**
-   - If the standard answer is "social responsibility", accept "social obligation", "community duty", or "civic responsibility"
-   - If the standard is "adult education", accept "lifelong learning" or "continuing education"
-   - If the standard is "It is common that...", accept "It is ordinary that..." or "It is usual that..."
+**CORE PRINCIPLES (核心原则):**
 
-2. **Evaluate Semantic Correctness**
-   - Check if the student's sentence conveys the same meaning as expected
-   - Consider grammar, tone, tense, and logical coherence with the essay context
-   - Accept different sentence structures if the meaning is preserved
+1. **Analysis in Chinese, Polished Version in English (分析用中文，润色用英文)**:
+   - ALL analysis, comments, strengths, weaknesses → Chinese (中文)
+   - polished_version field → ENGLISH ONLY (必须是英文句子！)
+   - DO NOT translate the polished_version to Chinese! (不要把润色建议翻译成中文！)
 
-3. **Provide Constructive Feedback**
-   - Explain specifically why a synonym works or doesn't work
-   - Point out grammar or tense errors if present
-   - Suggest improvements in the polished version
+2. **Specific Analysis (分析必须具体)**:
+   - Don't just say "grammar error" - specify which word, which tense
+   - Quote the original text as evidence
+   - 不要只说"语法错误"，要指出具体是哪个词、哪个时态错了
 
-4. **Grading Scale with Quantified Criteria**
-   - S (Excellent, 95-100): Perfect or near-perfect. Semantically accurate, grammatically flawless, contextually appropriate, and demonstrates sophisticated expression.
-   - A (Good, 85-94): Semantically correct with minor expression issues. May have 1-2 minor stylistic improvements possible, but no grammar errors.
-   - B (Fair, 70-84): Partially correct but with notable issues. May have 1-2 grammar errors OR semantic inaccuracies that don't completely change the meaning.
-   - C (Poor, <70): Significant errors in meaning or grammar. Multiple errors that substantially affect comprehension or correctness.`;
+3. **Professional Tone (语气专业)**:
+   - Academic, objective, encouraging
+   - 保持学术、客观、鼓励性的语气
+
+4. **Length Requirements (字数要求)**:
+   - Overall analysis: at least 150 characters (总分析至少 150 字)
+   - Each point: at least 50 characters (每个维度至少 50 字)
+
+**GRADING SCALE (评分标准):**
+- S (Excellent, 95-100): Semantically accurate, grammatically perfect, contextually appropriate, sophisticated expression
+- A (Good, 85-94): Semantically correct, 1-2 minor stylistic improvements possible, no grammar errors
+- B (Fair, 70-84): Partially correct with notable issues, may have 1-2 grammar errors or semantic deviations
+- C (Poor, <70): Significant semantic or grammatical errors that seriously affect comprehension`;
 
 /**
- * 翻译题专用评估标准
+ * 模式 1：单句精细分析（微观视角）
  */
-const TRANSLATION_CRITERIA = `
+const SENTENCE_MODE_PROMPT = `
 
-**TRANSLATION-SPECIFIC EVALUATION:**
+**当前模式：【单句精细分析】**
 
-Focus on the "信达雅" (Faithfulness, Expressiveness, Elegance) principle:
+请关注以下维度：
 
-1. **Faithfulness (信)**: Does the translation preserve the original meaning, tone, and nuance?
-   - Deduct points for: Missing information, added information, changed meaning
+1. **语法准确性**：时态、语态、主谓一致、冠词使用。
+   - 必须指出具体错误位置，例如："第 3 个词 'was' 应改为 'were'，因为主语是复数"
    
-2. **Expressiveness (达)**: Is the translation fluent and natural in English?
-   - Deduct points for: Awkward phrasing, unnatural word order, Chinglish patterns
+2. **词汇精准度**：搭配是否地道，是否存在中式英语。
+   - 必须引用原文，例如："'do exercise' 应改为 'take exercise' 或 'work out'，更符合英语习惯"
    
-3. **Elegance (雅)**: Does the translation demonstrate good style and appropriate register?
-   - Deduct points for: Overly literal translation, inappropriate formality level
-
-**Radar Dimensions for Translation:**
-- faithfulness: Accuracy in preserving original meaning (0-100)
-- expressiveness: Fluency and naturalness (0-100)
-- elegance: Style and register appropriateness (0-100)
-- grammar: Grammatical correctness (0-100)`;
+3. **语境契合度**：该句子是否符合上下文的逻辑和语体。
+   - 分析句子与前后文的衔接是否自然
+   
+4. **翻译信达雅**（如果是翻译题）：是否准确还原原文，是否优美。`;
 
 /**
- * 写作/造句题专用评估标准
+ * 模式 2：全文/段落分析（宏观视角）
  */
-const WRITING_CRITERIA = `
+const ARTICLE_MODE_PROMPT = `
 
-**WRITING-SPECIFIC EVALUATION:**
+**当前模式：【全文/段落宏观评价】**
 
-Focus on creativity, logic, and structure:
+请关注以下维度：
 
-1. **Creativity & Vocabulary**: Does the sentence demonstrate good word choice and originality?
-   - Deduct points for: Repetitive vocabulary, overly simple expressions, lack of variety
+1. **篇章结构**：论点是否清晰，段落划分是否合理。
+   - 分析开头、主体、结尾的逻辑关系
    
-2. **Logic & Coherence**: Does the sentence flow logically and connect well with the context?
-   - Deduct points for: Logical gaps, unclear connections, contradictions
+2. **逻辑连贯性**：衔接词的使用，论证的深度。
+   - 指出哪些地方缺少过渡，哪些论证不够充分
    
-3. **Structure**: Is the sentence well-structured with appropriate complexity?
-   - Deduct points for: Run-on sentences, fragments, overly simple structure when complexity is expected
-
-**Radar Dimensions for Writing:**
-- vocabulary: Quality and appropriateness of word choice (0-100)
-- logic: Logical flow and argument strength (0-100)
-- structure: Sentence structure and organization (0-100)
-- content: Relevance and depth of content (0-100)`;
+3. **内容丰富度**：是否有实质性内容，而非空话套话。
+   - 评估论据的质量和多样性
+   
+4. **文体风格**：是否符合学术或题目要求的文体（如正式、非正式）。
+   - 指出语域是否恰当`;
 
 /**
- * 结构化输出格式要求
+ * 结构化输出格式要求（中文）
  */
 const OUTPUT_FORMAT = `
 
-**Output Format:** You MUST respond with valid JSON only, no additional text:
+**OUTPUT FORMAT (输出格式):**
+
+You MUST respond with valid JSON in this EXACT format (no markdown code blocks):
 
 {
   "score": "S" | "A" | "B" | "C",
   "is_semantically_correct": boolean,
+  "analysis": "Brief Chinese summary (100-200 chars, 中文总评)",
   "analysis_breakdown": {
-    "strengths": ["List of specific strengths", "e.g., Good use of vocabulary", "Correct tense"],
-    "weaknesses": ["List of specific weaknesses", "e.g., Slightly awkward phrasing in the second clause"],
-    "context_match": "Brief description of how well the sentence fits the essay context"
+    "strengths": [
+      "Chinese strength 1 (at least 50 chars, 中文优点，引用原文)",
+      "Chinese strength 2 (at least 50 chars, 中文优点，引用原文)"
+    ],
+    "weaknesses": [
+      "Chinese weakness 1 (at least 50 chars, 中文不足，引用原文)",
+      "Chinese weakness 2 (at least 50 chars, 中文不足，引用原文)"
+    ],
+    "contextMatch": "Chinese context analysis (at least 80 chars, 中文语境分析)"
   },
-  "analysis": "Comprehensive feedback combining all aspects (for backward compatibility)",
-  "polished_version": "An improved version of the student's sentence, or the original if already excellent.",
+  "polished_version": "IMPROVED ENGLISH SENTENCE HERE (MUST BE ENGLISH! 必须是英文句子！If the original is already good, keep it as is; otherwise provide an improved English version. DO NOT translate to Chinese!)",
   "radar_dimensions": {
-    "dim1": 85,
-    "dim2": 90,
-    "dim3": 88,
-    "dim4": 92,
-    "labels": ["Label1", "Label2", "Label3", "Label4"]
+    "dim1": 0-100,
+    "dim2": 0-100,
+    "dim3": 0-100,
+    "dim4": 0-100,
+    "labels": ["维度1中文名", "维度2中文名", "维度3中文名", "维度4中文名"]
   }
-}`;
+}
+
+**CRITICAL RULES (重要规则):**
+- analysis, strengths, weaknesses, contextMatch → Chinese (中文)
+- polished_version → ENGLISH ONLY (只能是英文！)
+- Quote specific text from student's submission
+- Provide detailed, evidence-based analysis
+- Sufficient length: overall analysis ≥150 chars, each point ≥50 chars`;
 
 /**
  * 自动检测评估类型
@@ -126,41 +139,81 @@ export function detectEvaluationType(directions: string): EvaluationType {
 }
 
 /**
- * 构建动态系统提示词（根据评估类型）
+ * 构建动态系统提示词（根据评估模式和类型）
  */
-export function buildSystemPrompt(evaluationType: EvaluationType): string {
-  const criteria = evaluationType === 'translation' ? TRANSLATION_CRITERIA : WRITING_CRITERIA;
-  return BASE_SYSTEM_PROMPT + criteria + OUTPUT_FORMAT;
+export function buildSystemPrompt(
+  mode: EvaluationMode = 'sentence',
+  evaluationType?: EvaluationType
+): string {
+  const modePrompt = mode === 'article' ? ARTICLE_MODE_PROMPT : SENTENCE_MODE_PROMPT;
+  
+  // 根据评估类型添加雷达图维度说明
+  let radarHint = '';
+  if (evaluationType === 'translation') {
+    radarHint = `\n**雷达图维度（翻译题）：**\n- 信 (Faithfulness): 准确还原原文\n- 达 (Expressiveness): 表达流畅自然\n- 雅 (Elegance): 文体优美得体\n- 语法 (Grammar): 语法正确性`;
+  } else {
+    radarHint = `\n**雷达图维度（写作题）：**\n- 词汇 (Vocabulary): 词汇丰富度和准确性\n- 逻辑 (Logic): 逻辑连贯性\n- 结构 (Structure): 句式/篇章结构\n- 内容 (Content): 内容深度和相关性`;
+  }
+  
+  return BASE_ROLE + modePrompt + radarHint + OUTPUT_FORMAT;
 }
 
 /**
- * 旧版系统提示词（向后兼容）
- */
-export const EVALUATION_SYSTEM_PROMPT = BASE_SYSTEM_PROMPT + WRITING_CRITERIA + OUTPUT_FORMAT;
-
-/**
- * 创建用户评估提示词（增强版，支持动态类型检测）
+ * 创建用户评估提示词（增强版，支持模式和类型检测）
  * 
- * 将用户输入的三个部分组合成完整的评估请求
- * 
- * @param input - 评估输入数据（题目要求、文章语境、学生答案）
- * @returns 格式化的用户提示词
+ * @param input - 评估输入数据
+ * @returns 格式化的用户提示词（中文）
  */
 export function createEvaluationPrompt(input: EvaluationInput): string {
-  // 自动检测或使用指定的评估类型
+  const mode = input.mode || 'sentence';
   const evaluationType = input.evaluationType || detectEvaluationType(input.directions);
   
-  return `**Evaluation Type:** ${evaluationType === 'translation' ? 'Translation Task' : 'Writing/Composition Task'}
-
-**Directions:** ${input.directions}
-
-**Essay Context:**
-${input.essayContext}
-
-**Student's Sentence:**
+  const modeText = mode === 'sentence' ? '单句精细分析' : '全文/段落宏观评价';
+  const typeText = evaluationType === 'translation' ? '翻译题' : '写作题';
+  
+  if (mode === 'article') {
+    // 全文模式：essayContext 可能为空
+    return `【评估模式】: ${modeText}
+【题目类型】: ${typeText}
+【题目要求】: ${input.directions}
+【学生提交的全文/段落】:
 ${input.studentSentence}
 
-Please evaluate the student's sentence based on the directions and context above. Use the ${evaluationType}-specific criteria defined in the system prompt.`;
+请根据上述信息，使用"全文/段落宏观评价"标准进行评估。
+
+⚠️ CRITICAL REQUIREMENTS:
+1. All analysis (analysis, strengths, weaknesses, contextMatch) MUST be in Chinese (中文)
+2. The "polished_version" field MUST be in ENGLISH, NOT Chinese!
+3. Quote specific parts from the student's text in your analysis
+4. Provide sufficient detail (at least 150 characters for overall analysis)
+
+记住：
+- 所有分析必须用中文
+- polished_version 必须是英文句子！
+- 必须引用学生原文进行具体分析`;
+  } else {
+    // 单句模式：需要语境
+    return `【评估模式】: ${modeText}
+【题目类型】: ${typeText}
+【题目要求】: ${input.directions}
+【文章语境/背景】:
+${input.essayContext || "无"}
+【学生提交的句子】:
+${input.studentSentence}
+
+请根据上述信息，使用"单句精细分析"标准进行评估。
+
+⚠️ CRITICAL REQUIREMENTS:
+1. All analysis (analysis, strengths, weaknesses, contextMatch) MUST be in Chinese (中文)
+2. The "polished_version" field MUST be in ENGLISH, NOT Chinese!
+3. Quote specific parts from the student's text in your analysis
+4. Provide sufficient detail (at least 150 characters for overall analysis)
+
+记住：
+- 所有分析必须用中文
+- polished_version 必须是英文句子！
+- 必须引用学生原文进行具体分析`;
+  }
 }
 
 /**

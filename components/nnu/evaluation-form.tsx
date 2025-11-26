@@ -10,7 +10,7 @@ import { ZodError } from "zod";
 import { debounce } from "@/lib/performance";
 import { evaluationRateLimiter } from "@/lib/rate-limiter";
 import { isUsingCustomAPI } from "@/lib/settings";
-import { RefreshCw, Send, FileText, Cloud, Key, Shuffle } from "lucide-react";
+import { RefreshCw, Send, FileText, Cloud, Key, Shuffle, ScanSearch } from "lucide-react";
 import sampleCasesData from "@/data/sample-cases.json";
 
 export interface EvaluationFormProps {
@@ -56,6 +56,7 @@ export function EvaluationForm({
     essayContext: false,
     studentSentence: false,
     evaluationType: false,
+    mode: false,
   });
   const [rateLimitError, setRateLimitError] = React.useState<string | null>(null);
 
@@ -183,7 +184,7 @@ export function EvaluationForm({
       studentSentence: selection,
     };
     
-    setTouched({ directions: true, essayContext: true, studentSentence: true, evaluationType: false });
+    setTouched({ directions: true, essayContext: true, studentSentence: true, evaluationType: false, mode: false });
     
     try {
       EvaluationInputSchema.parse(evaluationData);
@@ -209,7 +210,7 @@ export function EvaluationForm({
       setRateLimitError(`请求过于频繁，请等待 ${waitTime} 秒后再试`);
       return;
     }
-    setTouched({ directions: true, essayContext: true, studentSentence: true, evaluationType: false });
+    setTouched({ directions: true, essayContext: true, studentSentence: true, evaluationType: false, mode: false });
     if (!validateForm()) return;
     evaluationRateLimiter.recordRequest();
     await onSubmit(formData);
@@ -223,7 +224,7 @@ export function EvaluationForm({
       studentSentence: sample.studentSentence,
     });
     setErrors([]);
-    setTouched({ directions: false, essayContext: false, studentSentence: false, evaluationType: false });
+    setTouched({ directions: false, essayContext: false, studentSentence: false, evaluationType: false, mode: false });
   };
 
   const handleNextSample = () => {
@@ -236,7 +237,7 @@ export function EvaluationForm({
       studentSentence: sample.studentSentence,
     });
     setErrors([]);
-    setTouched({ directions: false, essayContext: false, studentSentence: false, evaluationType: false });
+    setTouched({ directions: false, essayContext: false, studentSentence: false, evaluationType: false, mode: false });
   };
 
   const getFieldError = (field: keyof EvaluationInput): string | undefined => {
@@ -369,35 +370,69 @@ export function EvaluationForm({
       )}
 
       <div className="space-y-3">
-        {/* 评估选中句子按钮 */}
+        {/* 按钮 1: 单句模式 */}
         <Button
           type="button"
-          onClick={handleEvaluateSelection}
+          onClick={async () => {
+            if (!selection || !formData.directions) {
+              alert("请先在文章中选中一句要分析的句子");
+              return;
+            }
+            
+            setRateLimitError(null);
+            if (!evaluationRateLimiter.canMakeRequest()) {
+              const waitTime = Math.ceil(evaluationRateLimiter.getTimeUntilNextRequest() / 1000);
+              setRateLimitError(`请求过于频繁，请等待 ${waitTime} 秒后再试`);
+              return;
+            }
+            
+            const evaluationData = {
+              ...formData,
+              studentSentence: selection,
+              mode: 'sentence' as const,
+            };
+            
+            setTouched({ directions: true, essayContext: true, studentSentence: true, evaluationType: false, mode: false });
+            
+            try {
+              EvaluationInputSchema.parse(evaluationData);
+              setErrors([]);
+              evaluationRateLimiter.recordRequest();
+              await onSubmit(evaluationData);
+            } catch (error) {
+              if (error instanceof ZodError) {
+                const validationErrors: ValidationError[] = error.issues.map((err) => ({
+                  field: String(err.path[0]),
+                  message: err.message,
+                }));
+                setErrors(validationErrors);
+              }
+            }
+          }}
           disabled={isLoading || !selection || !formData.directions}
           className={cn(
-            "w-full py-4 rounded-lg font-bold text-white text-lg shadow-lg flex items-center justify-center gap-2 transition-all relative overflow-hidden",
+            "w-full py-6 rounded-lg font-bold text-lg shadow-sm flex items-center justify-center gap-2 transition-all",
             isLoading 
-              ? "bg-gray-400 cursor-not-allowed" 
+              ? "bg-gray-400 cursor-not-allowed text-white" 
               : selection && formData.directions
-              ? "bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 hover:shadow-2xl neon-glow-btn"
-              : "bg-gray-300 cursor-not-allowed"
+              ? "bg-white border-2 border-nnu-green text-nnu-green hover:bg-nnu-green hover:text-white"
+              : "bg-gray-200 cursor-not-allowed text-gray-400"
           )}
         >
           {isLoading ? (
             <>
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 animate-pulse" />
-              <RefreshCw className="w-5 h-5 animate-spin relative z-10" />
-              <span className="relative z-10">DeepSeek 分析中...</span>
+              <RefreshCw className="w-5 h-5 animate-spin" />
+              <span>AI 分析中...</span>
             </>
           ) : (
             <>
-              <Send className="w-5 h-5" />
-              AI 智能评估选中句子
+              <ScanSearch className="w-5 h-5" />
+              深度分析选中长难句
             </>
           )}
         </Button>
 
-        {/* 评价全文按钮 */}
+        {/* 按钮 2: 全文模式 */}
         <Button
           type="button"
           onClick={async () => {
@@ -413,9 +448,10 @@ export function EvaluationForm({
             const evaluationData = {
               ...formData,
               studentSentence: formData.essayContext,
+              mode: 'article' as const,
             };
             
-            setTouched({ directions: true, essayContext: true, studentSentence: true, evaluationType: false });
+            setTouched({ directions: true, essayContext: true, studentSentence: true, evaluationType: false, mode: false });
             
             try {
               EvaluationInputSchema.parse(evaluationData);
@@ -434,16 +470,16 @@ export function EvaluationForm({
           }}
           disabled={isLoading || !formData.essayContext || !formData.directions}
           className={cn(
-            "w-full py-4 rounded-lg font-bold text-white text-base shadow-lg flex items-center justify-center gap-2 transition-all",
+            "w-full py-6 rounded-lg font-bold text-lg shadow-md flex items-center justify-center gap-2 transition-all",
             isLoading 
-              ? "bg-gray-400 cursor-not-allowed" 
+              ? "bg-gray-400 cursor-not-allowed text-white" 
               : formData.essayContext && formData.directions
-              ? "bg-gradient-to-r from-nnu-green to-nnu-jade hover:shadow-xl"
-              : "bg-gray-300 cursor-not-allowed"
+              ? "bg-nnu-green text-white hover:bg-nnu-green/90"
+              : "bg-gray-200 cursor-not-allowed text-gray-400"
           )}
         >
           <FileText className="w-5 h-5" />
-          AI 智能评价全文
+          全文/段落宏观评测
         </Button>
       </div>
     </form>

@@ -54,53 +54,69 @@ export const ResultCard: React.FC<ResultCardProps> = ({ result, showRadarChart =
   // 使用结构化分析（如果有），否则回退到传统分析
   const analysisDetails = analysisBreakdown ? [
     {
-      type: isSemanticallyCorrect ? 'success' : 'warning',
-      title: '语义等价判定 (Semantic Equivalence)',
-      content: isSemanticallyCorrect 
-        ? '你的表达在语义上与标准答案等价，DeepSeek 判定为正确。'
-        : '你的表达与标准答案存在语义差异，建议参考润色建议进行改进。',
-    },
-    {
       type: 'strengths',
-      title: '✨ 优点 (Strengths)',
+      title: '亮点与优势',
+      icon: <CheckCircle className="w-5 h-5 text-green-600" />,
       content: analysisBreakdown.strengths.length > 0 
         ? analysisBreakdown.strengths 
         : ['整体表达流畅'],
+      bgColor: 'bg-green-50',
+      borderColor: 'border-green-100',
     },
     {
       type: 'weaknesses',
-      title: '⚠️ 需要改进 (Areas for Improvement)',
+      title: '待改进之处',
+      icon: <XCircle className="w-5 h-5 text-red-600" />,
       content: analysisBreakdown.weaknesses.length > 0 
         ? analysisBreakdown.weaknesses 
         : ['暂无明显问题'],
+      bgColor: 'bg-red-50',
+      borderColor: 'border-red-100',
     },
     {
       type: 'context',
-      title: '📝 语境契合度 (Context Match)',
+      title: '语境契合度分析',
+      icon: <BookOpen className="w-5 h-5 text-blue-600" />,
       content: analysisBreakdown.contextMatch || '与语境匹配良好',
+      bgColor: 'bg-blue-50',
+      borderColor: 'border-blue-100',
     },
     {
       type: 'suggestion',
-      title: '💡 AI 润色建议 (Polished Version)',
+      title: '专家润色建议 (Polished Version)',
+      icon: <Lightbulb className="w-5 h-5 text-nnu-gold" />,
       content: polishedVersion,
+      bgColor: 'bg-nnu-paper',
+      borderColor: 'border-nnu-gold/30',
     },
   ] : [
     {
       type: isSemanticallyCorrect ? 'success' : 'warning',
-      title: '语义等价判定 (Semantic Equivalence)',
+      title: '语义等价判定',
+      icon: isSemanticallyCorrect 
+        ? <CheckCircle className="w-5 h-5 text-green-600" />
+        : <AlertCircle className="w-5 h-5 text-yellow-600" />,
       content: isSemanticallyCorrect 
-        ? '你的表达在语义上与标准答案等价，DeepSeek 判定为正确。'
+        ? '你的表达在语义上与标准答案等价，AI 判定为正确。'
         : '你的表达与标准答案存在语义差异，建议参考润色建议进行改进。',
+      bgColor: isSemanticallyCorrect ? 'bg-green-50' : 'bg-yellow-50',
+      borderColor: isSemanticallyCorrect ? 'border-green-100' : 'border-yellow-100',
     },
     {
       type: 'info',
-      title: '语境契合度 (Context Awareness)',
+      title: '语境契合度',
+      icon: <BookOpen className="w-5 h-5 text-blue-600" />,
       content: analysis,
+      bgColor: 'bg-blue-50',
+      borderColor: 'border-blue-100',
     },
     {
       type: 'suggestion',
-      title: 'AI 润色建议 (Polishing)',
+      title: 'AI 润色建议',
+      icon: <Lightbulb className="w-5 h-5 text-nnu-gold" />,
       content: polishedVersion,
+      bgColor: 'bg-nnu-paper',
+      borderColor: 'border-nnu-gold/30',
     },
   ];
 
@@ -155,11 +171,10 @@ export const ResultCard: React.FC<ResultCardProps> = ({ result, showRadarChart =
           )}
         </div>
 
-        {/* Summary */}
-        <div className="bg-nnu-paper p-4 rounded-lg border border-nnu-gold/30 mb-4">
-          <p className="text-nnu-green text-sm font-medium leading-relaxed italic">
-            "{isSemanticallyCorrect ? 'Excellent work! Your translation demonstrates a deep understanding of the context.' : 'Good effort! There are some areas that could be improved.'}"
-          </p>
+        {/* AI 总评 */}
+        <div className="text-gray-700 leading-relaxed border-l-4 border-nnu-green pl-4 py-2 bg-gray-50 mb-4">
+          <h4 className="text-sm font-bold text-nnu-green mb-1">AI 总评</h4>
+          <p className="text-sm">{analysis}</p>
         </div>
 
         {/* Reasoning Process (if available) */}
@@ -199,42 +214,43 @@ export const ResultCard: React.FC<ResultCardProps> = ({ result, showRadarChart =
           </div>
         )}
 
-        {/* Detail Analysis */}
-        <div className="space-y-3">
-          {analysisDetails.map((item, idx) => (
+        {/* 详细列表展示 */}
+        <div className="grid gap-4">
+          {analysisDetails.map((section, idx) => (
             <div 
               key={idx} 
               className={cn(
-                "border rounded-lg p-3 hover:shadow-md transition bg-white",
-                selectedDimension && item.title.includes(selectedDimension) 
-                  ? "border-blue-400 bg-blue-50" 
-                  : "border-gray-100"
+                "p-4 rounded-lg border transition-all",
+                section.bgColor,
+                section.borderColor,
+                selectedDimension && section.title.includes(selectedDimension) 
+                  ? "ring-2 ring-blue-400" 
+                  : ""
               )}
             >
-              <div className="flex items-start gap-3">
-                {item.type === 'success' && <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 shrink-0" />}
-                {item.type === 'warning' && <AlertCircle className="w-5 h-5 text-yellow-500 mt-0.5 shrink-0" />}
-                {item.type === 'info' && <BookOpen className="w-5 h-5 text-blue-500 mt-0.5 shrink-0" />}
-                {item.type === 'strengths' && <Lightbulb className="w-5 h-5 text-green-500 mt-0.5 shrink-0" />}
-                {item.type === 'weaknesses' && <AlertCircle className="w-5 h-5 text-orange-500 mt-0.5 shrink-0" />}
-                {item.type === 'context' && <BookOpen className="w-5 h-5 text-blue-500 mt-0.5 shrink-0" />}
-                {item.type === 'suggestion' && <Lightbulb className="w-5 h-5 text-nnu-coral mt-0.5 shrink-0" />}
-                
-                <div className="flex-1">
-                  <h4 className="font-bold text-gray-800 text-sm">{item.title}</h4>
-                  {Array.isArray(item.content) ? (
-                    <ul className="text-gray-600 text-xs mt-1 leading-relaxed list-disc list-inside space-y-1">
-                      {item.content.map((point, i) => (
-                        <li key={i}>{point}</li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className="text-gray-600 text-xs mt-1 leading-relaxed">
-                      {item.content}
-                    </p>
-                  )}
-                </div>
+              <div className="flex items-center gap-2 mb-3">
+                {section.icon}
+                <h4 className="font-bold text-gray-900">{section.title}</h4>
               </div>
+              {Array.isArray(section.content) ? (
+                <ul className="space-y-2">
+                  {section.content.map((item, i) => (
+                    <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                      <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-gray-400 shrink-0" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className={cn(
+                  "text-sm leading-relaxed",
+                  section.type === 'suggestion' 
+                    ? "text-gray-800 font-mono bg-white p-3 rounded border border-gray-200 italic" 
+                    : "text-gray-700 font-medium"
+                )}>
+                  {section.content}
+                </p>
+              )}
             </div>
           ))}
         </div>

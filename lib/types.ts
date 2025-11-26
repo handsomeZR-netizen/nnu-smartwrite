@@ -6,13 +6,19 @@ import { z } from 'zod';
 export type EvaluationType = 'translation' | 'writing';
 
 /**
+ * 评估模式：单句分析 vs 全文分析
+ */
+export type EvaluationMode = 'sentence' | 'article';
+
+/**
  * 评估输入数据结构
  */
 export interface EvaluationInput {
   directions: string;      // 题目要求
   essayContext: string;    // 文章语境
-  studentSentence: string; // 学生答案
+  studentSentence: string; // 学生答案（可以是句子或全文）
   evaluationType?: EvaluationType; // 可选：评估类型（默认自动检测）
+  mode?: EvaluationMode;   // 可选：评估模式（默认为 sentence）
 }
 
 /**
@@ -20,9 +26,10 @@ export interface EvaluationInput {
  */
 export const EvaluationInputSchema = z.object({
   directions: z.string().trim().min(1, '题目要求不能为空').max(500, '题目要求不能超过500字符'),
-  essayContext: z.string().trim().min(1, '文章语境不能为空').max(2000, '文章语境不能超过2000字符'),
+  essayContext: z.string().trim().max(2000, '文章语境不能超过2000字符'), // 全文模式下可以为空
   studentSentence: z.string().trim().min(1, '学生答案不能为空').max(1000, '学生答案不能超过1000字符'),
   evaluationType: z.enum(['translation', 'writing']).optional(),
+  mode: z.enum(['sentence', 'article']).optional().default('sentence'),
 });
 
 /**

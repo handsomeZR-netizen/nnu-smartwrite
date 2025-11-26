@@ -2,7 +2,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
-import { Target, BarChart3, BookOpen, Sparkles } from "lucide-react";
+import { Target, BarChart3, BookOpen, Sparkles, BrainCircuit, ScanSearch, ChartBar, ListChecks } from "lucide-react";
 import { MagneticButton } from "@/components/nnu/magnetic-button";
 
 export default function Home() {
@@ -101,7 +101,7 @@ export default function Home() {
         <div className="container mx-auto max-w-5xl">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-nnu-green mb-4">
-              🚀 全新 AI 能力升级
+              全新 AI 能力升级
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
               基于 DeepSeek-Reasoner 模型，我们实现了更智能、更透明、更精准的评估体验
@@ -113,7 +113,7 @@ export default function Home() {
             <div className="p-6 rounded-xl border-2 border-nnu-green/20 hover:border-nnu-green/40 transition-all">
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 rounded-lg bg-nnu-green/10 flex items-center justify-center shrink-0">
-                  <span className="text-xl">🧠</span>
+                  <BrainCircuit className="w-6 h-6 text-nnu-green" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-nnu-green mb-2">AI 推理过程可视化</h3>
@@ -128,7 +128,7 @@ export default function Home() {
             <div className="p-6 rounded-xl border-2 border-nnu-green/20 hover:border-nnu-green/40 transition-all">
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 rounded-lg bg-nnu-green/10 flex items-center justify-center shrink-0">
-                  <span className="text-xl">🎯</span>
+                  <ScanSearch className="w-6 h-6 text-nnu-green" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-nnu-green mb-2">智能任务识别</h3>
@@ -143,7 +143,7 @@ export default function Home() {
             <div className="p-6 rounded-xl border-2 border-nnu-green/20 hover:border-nnu-green/40 transition-all">
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 rounded-lg bg-nnu-green/10 flex items-center justify-center shrink-0">
-                  <span className="text-xl">📊</span>
+                  <ChartBar className="w-6 h-6 text-nnu-green" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-nnu-green mb-2">动态雷达图维度</h3>
@@ -158,7 +158,7 @@ export default function Home() {
             <div className="p-6 rounded-xl border-2 border-nnu-green/20 hover:border-nnu-green/40 transition-all">
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 rounded-lg bg-nnu-green/10 flex items-center justify-center shrink-0">
-                  <span className="text-xl">✨</span>
+                  <ListChecks className="w-6 h-6 text-nnu-green" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-nnu-green mb-2">结构化反馈清单</h3>

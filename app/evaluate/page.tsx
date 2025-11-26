@@ -8,12 +8,14 @@ import { Button } from "@/components/ui/button";
 import type { EvaluationInput, EvaluationResult, APIError } from "@/lib/types";
 import { saveToHistory } from "@/lib/storage";
 import { ResultCardSkeleton } from "@/components/nnu/skeletons";
-import { Activity, GraduationCap, AlertTriangle, RotateCcw, ArrowLeft } from "lucide-react";
+import { Activity, GraduationCap, AlertTriangle, RotateCcw, ArrowLeft, Trash2 } from "lucide-react";
 
 const ResultCard = dynamic(
   () => import("@/components/nnu/result-card").then(mod => mod.ResultCard),
   { loading: () => <ResultCardSkeleton />, ssr: false }
 );
+
+const CURRENT_EVALUATION_KEY = 'nnu-current-evaluation';
 
 export default function EvaluatePage() {
   const [isLoading, setIsLoading] = React.useState(false);
@@ -21,6 +23,24 @@ export default function EvaluatePage() {
   const [error, setError] = React.useState<APIError | null>(null);
   const [currentInput, setCurrentInput] = React.useState<EvaluationInput | null>(null);
   const showResult = !!result;
+
+  // 页面加载时恢复上次的评测结果
+  React.useEffect(() => {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        const saved = localStorage.getItem(CURRENT_EVALUATION_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed.result && parsed.input) {
+            setResult(parsed.result);
+            setCurrentInput(parsed.input);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Failed to restore evaluation:', error);
+    }
+  }, []);
 
   const callEvaluationAPI = async (input: EvaluationInput): Promise<EvaluationResult> => {
     // 获取自定义API配置
@@ -82,9 +102,24 @@ export default function EvaluatePage() {
     try {
       const evaluationResult = await callEvaluationAPI(input);
       setResult(evaluationResult);
+      
+      // 保存到历史记录
       const saved = saveToHistory(input, evaluationResult);
       if (!saved) {
         console.warn('Failed to save evaluation to history');
+      }
+      
+      // 自动保存当前评测结果到 localStorage
+      try {
+        if (typeof window !== 'undefined' && window.localStorage) {
+          localStorage.setItem(CURRENT_EVALUATION_KEY, JSON.stringify({
+            result: evaluationResult,
+            input: input,
+            timestamp: Date.now(),
+          }));
+        }
+      } catch (saveError) {
+        console.error('Failed to save current evaluation:', saveError);
       }
     } catch (err) {
       if (err && typeof err === 'object' && 'error' in err) {
@@ -111,6 +146,15 @@ export default function EvaluatePage() {
     setResult(null);
     setError(null);
     setCurrentInput(null);
+    
+    // 清空 localStorage 中的当前评测
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        localStorage.removeItem(CURRENT_EVALUATION_KEY);
+      }
+    } catch (error) {
+      console.error('Failed to clear current evaluation:', error);
+    }
   };
 
   return (
@@ -187,7 +231,21 @@ export default function EvaluatePage() {
 
             {/* 结果展示 */}
             {result && (
-              <ResultCard result={result} showRadarChart={!!(result.radarScores || result.radarDimensions)} />
+              <div className="space-y-4">
+                <ResultCard result={result} showRadarChart={!!(result.radarScores || result.radarDimensions)} />
+                
+                {/* 清空按钮 */}
+                <div className="flex justify-center">
+                  <Button 
+                    onClick={handleReset} 
+                    variant="outline"
+                    className="text-gray-600 hover:text-red-600 hover:border-red-300"
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    清空当前评测
+                  </Button>
+                </div>
+              </div>
             )}
           </div>
         </div>

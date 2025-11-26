@@ -123,6 +123,13 @@ function parseAIResponse(
     // 处理 polished_version 字段
     const polishedVersion = parsed.polished_version || parsed.polishedVersion || parsed.improved_version || '';
     
+    // 验证 polished_version 是否包含中文（这是错误的）
+    if (polishedVersion && /[\u4e00-\u9fa5]/.test(polishedVersion)) {
+      console.warn('⚠️ WARNING: polished_version contains Chinese characters, this is incorrect!');
+      console.warn('   Content:', polishedVersion);
+      console.warn('   This should be an English sentence, not Chinese!');
+    }
+    
     // 处理 analysis_breakdown 字段
     const breakdown = parsed.analysis_breakdown || parsed.analysisBreakdown;
     const analysisBreakdown = breakdown ? {
@@ -250,7 +257,7 @@ async function callDeepSeekAPI(
   const requestBody: DeepSeekRequest = {
     model,
     messages,
-    temperature: 0.3,
+    temperature: 0.1, // 降低到 0.1 让 AI 更严格遵循指令（特别是 polished_version 必须是英文）
     max_tokens: 2000, // 增加 token 限制以支持推理过程
     stream: false,
   };
@@ -464,7 +471,8 @@ export async function POST(request: NextRequest) {
     // 进一步清理输入（移除多余空白等）
     const cleanedInput = sanitizeEvaluationInput(input);
     
-    // 检测或使用指定的评估类型
+    // 获取评估模式和类型
+    const mode = cleanedInput.mode || 'sentence';
     const evaluationType = cleanedInput.evaluationType || detectEvaluationType(cleanedInput.directions);
     
     // 检查是否有 API 密钥
@@ -478,8 +486,8 @@ export async function POST(request: NextRequest) {
       parsedResponse = generateMockResponse(evaluationType);
     } else {
       // 正常模式：调用真实 API
-      // 构建动态系统提示词
-      const systemPrompt = buildSystemPrompt(evaluationType);
+      // 构建动态系统提示词（传入模式和类型）
+      const systemPrompt = buildSystemPrompt(mode, evaluationType);
       
       // 构建消息
       const messages: DeepSeekMessage[] = [
