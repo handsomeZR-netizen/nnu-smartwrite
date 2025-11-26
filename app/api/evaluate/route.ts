@@ -89,7 +89,11 @@ async function callDeepSeekAPI(
     throw new Error('DEEPSEEK_API_KEY is not configured');
   }
 
-  const endpoint = customAPIEndpoint || 'https://api.deepseek.com/v1/chat/completions';
+  // 如果自定义端点已包含完整路径，直接使用；否则添加 /chat/completions
+  const baseEndpoint = customAPIEndpoint || 'https://api.deepseek.com/v1';
+  const endpoint = baseEndpoint.includes('/chat/completions') 
+    ? baseEndpoint 
+    : `${baseEndpoint}/chat/completions`;
   const model = customAPIModel || 'deepseek-chat';
 
   const requestBody: DeepSeekRequest = {

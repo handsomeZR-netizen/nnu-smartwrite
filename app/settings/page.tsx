@@ -212,13 +212,13 @@ export default function SettingsPage() {
                   <Input
                     id="apiEndpoint"
                     type="url"
-                    placeholder="https://api.deepseek.com/v1/chat/completions"
+                    placeholder="https://api.deepseek.com/v1"
                     value={settings.api.customAPIEndpoint || ''}
                     onChange={(e) => handleCustomAPIChange('customAPIEndpoint', e.target.value)}
                     className="font-mono text-sm"
                   />
                   <p className="text-xs text-gray-500">
-                    留空使用默认 DeepSeek API 地址
+                    留空使用默认地址。可以只填基础 URL（如 https://api.deepseek.com/v1），系统会自动添加 /chat/completions
                   </p>
                 </div>
 
