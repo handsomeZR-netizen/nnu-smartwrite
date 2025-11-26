@@ -1,26 +1,182 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
+  --background: #F9F7F2;
   --foreground: #171717;
+  
+  /* NNU Brand Colors */
+  --nnu-green: #1F6A52;
+  --nnu-coral: #FF7F50;
+  --nnu-jade: #5DB090;
+  --nnu-gold: #F4B860;
+  --nnu-paper: #F9F7F2;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  
+  /* NNU Theme Colors */
+  --color-nnu-green: var(--nnu-green);
+  --color-nnu-coral: var(--nnu-coral);
+  --color-nnu-jade: var(--nnu-jade);
+  --color-nnu-gold: var(--nnu-gold);
+  --color-nnu-paper: var(--nnu-paper);
+  
+  /* Font Families */
+  --font-sans: 'Inter', 'Noto Sans SC', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: 'Noto Serif SC', ui-serif, Georgia, serif;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+}
+
+/* Noise Texture Overlay */
+.noise-texture {
+  position: relative;
+}
+
+.noise-texture::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Magnetic Glow Button */
+.magnetic-btn {
+  --x: 50%;
+  --y: 50%;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.magnetic-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at var(--x) var(--y),
+    rgba(255, 255, 255, 0.3) 0%,
+    transparent 60%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.magnetic-btn:hover::before {
+  opacity: 1;
+}
+
+.magnetic-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 40px -10px rgba(31, 106, 82, 0.5);
+}
+
+.magnetic-btn .arrow-icon {
+  transition: transform 0.3s ease;
+}
+
+.magnetic-btn:hover .arrow-icon {
+  transform: translateX(4px);
+}
+
+/* Feature Card Hover Effects */
+.feature-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.feature-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px -15px rgba(31, 106, 82, 0.2);
+  border-color: rgba(31, 106, 82, 0.2);
+}
+
+.feature-card .icon-wrapper {
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.feature-card:hover .icon-wrapper {
+  transform: scale(1.1) rotate(5deg);
+  background-color: rgba(31, 106, 82, 0.15);
+}
+
+/* Glassmorphism Navigation */
+.glass-nav {
+  background: rgba(31, 106, 82, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Gradient backgrounds */
+.hero-gradient {
+  background: linear-gradient(
+    135deg,
+    var(--nnu-green) 0%,
+    #2a7d62 50%,
+    var(--nnu-green) 100%
+  );
+}
+
+/* Serif font for motto */
+.font-motto {
+  font-family: 'Noto Serif SC', 'Songti SC', serif;
+}
+
+/* Neon Glow Button Animation */
+.neon-glow-btn {
+  position: relative;
+  animation: neon-pulse 2s ease-in-out infinite;
+}
+
+.neon-glow-btn::before {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  background: linear-gradient(45deg, #ff0080, #ff8c00, #40e0d0, #ff0080, #ff8c00);
+  background-size: 400% 400%;
+  border-radius: 0.75rem;
+  opacity: 0.7;
+  filter: blur(20px);
+  z-index: -1;
+  animation: neon-rotate 3s linear infinite;
+}
+
+.neon-glow-btn:hover::before {
+  opacity: 1;
+  filter: blur(25px);
+}
+
+@keyframes neon-pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(255, 0, 128, 0.5),
+                0 0 40px rgba(255, 140, 0, 0.3),
+                0 0 60px rgba(64, 224, 208, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(255, 0, 128, 0.8),
+                0 0 60px rgba(255, 140, 0, 0.5),
+                0 0 90px rgba(64, 224, 208, 0.4);
+  }
+}
+
+@keyframes neon-rotate {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }

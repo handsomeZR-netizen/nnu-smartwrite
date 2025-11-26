@@ -1,0 +1,90 @@
+{
+  "version": "1.0",
+  "samples": [
+    {
+      "id": "sample-001",
+      "title": "社会责任感 - 翻译题",
+      "directions": "Translate the underlined sentence. Pay attention to the concept of duty.",
+      "essayContext": "In modern society, every individual plays a role in the community structure. We are bound not just by laws, but by unwritten rules. All in all, a sense of social obligation is what a citizen cannot live without.",
+      "category": "translation",
+      "difficulty": "medium"
+    },
+    {
+      "id": "sample-002",
+      "title": "科技与生活 - 翻译题",
+      "directions": "Translate the underlined sentence into Chinese.",
+      "essayContext": "Technology has revolutionized the way we communicate and work. Smartphones and the internet have made information accessible to billions of people worldwide. However, this digital transformation also brings challenges such as privacy concerns and digital addiction. It is essential that we find a balance between embracing innovation and maintaining our well-being.",
+      "category": "translation",
+      "difficulty": "medium"
+    },
+    {
+      "id": "sample-003",
+      "title": "教育改革 - 翻译题",
+      "directions": "Translate the underlined sentence into Chinese.",
+      "essayContext": "The traditional education system is undergoing significant changes. With the rise of online learning platforms, students now have access to courses from top universities around the world. This democratization of education has the potential to reduce inequality and provide opportunities for lifelong learning. Nevertheless, the quality of online education varies greatly, and not all students have equal access to technology.",
+      "category": "translation",
+      "difficulty": "hard"
+    },
+    {
+      "id": "sample-004",
+      "title": "环境保护 - 写作题",
+      "directions": "Write a sentence that summarizes the main idea of environmental protection in the context of individual responsibility.",
+      "essayContext": "Climate change is one of the most pressing issues facing humanity today. While governments and corporations play crucial roles in addressing this challenge, individual actions also matter. Simple choices like reducing plastic use, conserving energy, and supporting sustainable products can collectively make a significant impact. Every person has the power to contribute to a healthier planet.",
+      "category": "writing",
+      "difficulty": "medium"
+    },
+    {
+      "id": "sample-005",
+      "title": "文化交流 - 写作题",
+      "directions": "Write a sentence about the importance of cultural exchange in today's globalized world.",
+      "essayContext": "In an increasingly interconnected world, cultural exchange has become more important than ever. Through travel, education, and digital communication, people from different backgrounds can share their traditions, values, and perspectives. This cross-cultural dialogue fosters mutual understanding and helps break down stereotypes. It enriches our lives and promotes peace and cooperation among nations.",
+      "category": "writing",
+      "difficulty": "easy"
+    },
+    {
+      "id": "sample-006",
+      "title": "职业发展 - 翻译题",
+      "directions": "Translate the underlined sentence into Chinese.",
+      "essayContext": "Career development in the 21st century requires continuous learning and adaptation. The job market is constantly evolving due to technological advancements and changing economic conditions. Workers must be prepared to acquire new skills throughout their careers. Those who embrace lifelong learning are more likely to succeed in this dynamic environment.",
+      "category": "translation",
+      "difficulty": "medium"
+    },
+    {
+      "id": "sample-007",
+      "title": "健康生活 - 写作题",
+      "directions": "Write a sentence about the relationship between mental health and physical exercise.",
+      "essayContext": "The connection between physical and mental health is well-established in scientific research. Regular exercise not only strengthens the body but also improves mood and reduces stress. Many studies have shown that physical activity can be as effective as medication in treating mild to moderate depression. A holistic approach to health considers both physical and mental well-being.",
+      "category": "writing",
+      "difficulty": "easy"
+    },
+    {
+      "id": "sample-008",
+      "title": "人工智能伦理 - 翻译题",
+      "directions": "Translate the underlined sentence into Chinese.",
+      "essayContext": "Artificial intelligence is transforming industries and reshaping society at an unprecedented pace. From healthcare to transportation, AI systems are making decisions that affect millions of lives. As these technologies become more powerful, ethical considerations become increasingly important. We must ensure that AI development is guided by principles of fairness, transparency, and accountability.",
+      "category": "translation",
+      "difficulty": "hard"
+    },
+    {
+      "id": "sample-009",
+      "title": "城市化进程 - 翻译题",
+      "directions": "Translate the underlined sentence into Chinese.",
+      "essayContext": "Urbanization is one of the defining trends of the modern era. More than half of the world's population now lives in cities, and this proportion continues to grow. Urban areas offer economic opportunities, cultural diversity, and access to services. However, rapid urbanization also creates challenges such as overcrowding, pollution, and social inequality. Sustainable urban planning is crucial for creating livable cities.",
+      "category": "translation",
+      "difficulty": "medium"
+    },
+    {
+      "id": "sample-010",
+      "title": "代际关系 - 写作题",
+      "directions": "Write a sentence about the importance of intergenerational communication and understanding.",
+      "essayContext": "The generation gap has always existed, but it seems particularly pronounced in today's rapidly changing world. Younger generations grow up with technology that older generations struggle to understand. Meanwhile, older generations possess wisdom and experience that younger people may overlook. Bridging this gap requires patience, respect, and open communication from both sides.",
+      "category": "writing",
+      "difficulty": "medium"
+    }
+  ],
+  "metadata": {
+    "totalSamples": 10,
+    "lastUpdated": "2024-01-20",
+    "description": "丰富的示例案例库，涵盖翻译和写作多个主题"
+  }
+}

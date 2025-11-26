@@ -1,0 +1,78 @@
+{
+  "version": "1.0",
+  "questions": [
+    {
+      "id": "q001",
+      "type": "translation",
+      "title": "2024考研英语一翻译真题 - 成人教育",
+      "directions": "Translate the underlined sentence into Chinese.",
+      "essayContext": "Adult education is a growing field in modern society. It provides opportunities for people who have left formal schooling to continue their learning journey. Many adults return to education to improve their career prospects or pursue personal interests. The flexibility of adult education programs makes them accessible to working professionals. Research shows that lifelong learning contributes significantly to personal development and social progress.",
+      "difficulty": "medium"
+    },
+    {
+      "id": "q002",
+      "type": "translation",
+      "title": "2023考研英语二翻译真题 - 社会责任",
+      "directions": "Translate the underlined sentence into Chinese.",
+      "essayContext": "In today's interconnected world, social responsibility has become increasingly important. Companies are expected to consider their impact on society and the environment. Many organizations now recognize that social responsibility is not just about charity, but about integrating ethical practices into their core business operations. This shift reflects a broader understanding that businesses have obligations beyond profit-making.",
+      "difficulty": "medium"
+    },
+    {
+      "id": "q003",
+      "type": "translation",
+      "title": "2022考研英语一翻译真题 - 科技发展",
+      "directions": "Translate the underlined sentence into Chinese.",
+      "essayContext": "The rapid advancement of technology has transformed every aspect of modern life. From communication to healthcare, technological innovations continue to reshape how we live and work. However, this progress also brings challenges, including concerns about privacy, job displacement, and digital inequality. It is common that people feel overwhelmed by the pace of technological change. Balancing innovation with ethical considerations remains a critical challenge for society.",
+      "difficulty": "hard"
+    },
+    {
+      "id": "q004",
+      "type": "translation",
+      "title": "2021考研英语二翻译真题 - 环境保护",
+      "directions": "Translate the underlined sentence into Chinese.",
+      "essayContext": "Environmental protection has emerged as one of the most pressing issues of our time. Climate change, pollution, and biodiversity loss threaten the planet's ecosystems. Governments and individuals alike must take action to reduce their environmental footprint. Sustainable practices in agriculture, industry, and daily life are essential for preserving natural resources for future generations.",
+      "difficulty": "medium"
+    },
+    {
+      "id": "q005",
+      "type": "writing",
+      "title": "图表作文 - 大学生就业选择",
+      "directions": "Write an essay of 160-200 words based on the chart below. You should: 1) describe the chart briefly, 2) interpret its meaning, and 3) give your comments.",
+      "essayContext": "The chart illustrates the career choices of university graduates in 2023. According to the data, 45% chose to work in private enterprises, 25% in state-owned enterprises, 15% pursued further education, 10% started their own businesses, and 5% chose other paths. This distribution reflects significant changes in employment patterns compared to previous decades.",
+      "difficulty": "hard"
+    },
+    {
+      "id": "q006",
+      "type": "writing",
+      "title": "图画作文 - 文化交流",
+      "directions": "Write an essay of 160-200 words based on the picture below. You should: 1) describe the picture briefly, 2) interpret its meaning, and 3) give your comments.",
+      "essayContext": "The picture depicts two people from different cultural backgrounds exchanging traditional items - one holding Chinese calligraphy and the other holding Western musical instruments. They are smiling and appear engaged in friendly conversation. The background shows elements of both Eastern and Western architecture, symbolizing the meeting of different civilizations.",
+      "difficulty": "medium"
+    },
+    {
+      "id": "q007",
+      "type": "writing",
+      "title": "应用文 - 推荐信",
+      "directions": "Write a letter of recommendation for your friend Li Ming who is applying for a graduate program in Computer Science. You should write about 100 words. Do not sign your own name; use 'Zhang Wei' instead.",
+      "essayContext": "Li Ming has been your classmate for four years. He excels in programming and has participated in several national coding competitions, winning second prize in the National College Student Programming Contest. He is also the leader of your university's AI research club and has published two papers in student journals. He is hardworking, creative, and passionate about artificial intelligence.",
+      "difficulty": "easy"
+    },
+    {
+      "id": "q008",
+      "type": "writing",
+      "title": "议论文 - 网络教育的利弊",
+      "directions": "Write an essay of 160-200 words discussing the advantages and disadvantages of online education. You should present a balanced view and give your own opinion.",
+      "essayContext": "Online education has experienced explosive growth in recent years, especially accelerated by the COVID-19 pandemic. Millions of students worldwide now attend virtual classes from their homes. Proponents argue that online learning offers flexibility, accessibility, and cost savings. Critics, however, point to concerns about reduced social interaction, technical barriers, and varying quality of instruction.",
+      "difficulty": "medium"
+    }
+  ],
+  "categories": {
+    "translation": ["q001", "q002", "q003", "q004"],
+    "writing": ["q005", "q006", "q007", "q008"]
+  },
+  "metadata": {
+    "totalQuestions": 8,
+    "lastUpdated": "2024-01-15",
+    "description": "精选考研英语真题和模拟题，涵盖翻译和写作两大题型"
+  }
+}
