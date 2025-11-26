@@ -52,7 +52,21 @@ interface DeepSeekStreamChunk {
  */
 function parseAIResponse(content: string): Omit<EvaluationResult, 'timestamp'> {
   try {
-    const parsed = JSON.parse(content);
+    // 尝试提取 JSON 内容（处理可能的 markdown 代码块）
+    let jsonContent = content.trim();
+    
+    // 如果内容被 markdown 代码块包裹，提取 JSON
+    const jsonMatch = jsonContent.match(/```(?:json)?\s*(\{[\s\S]*\})\s*```/);
+    if (jsonMatch) {
+      jsonContent = jsonMatch[1];
+    }
+    
+    // 如果内容以 ```json 开头但没有结束标记，尝试提取
+    if (jsonContent.startsWith('```json')) {
+      jsonContent = jsonContent.replace(/^```json\s*/, '').replace(/```\s*$/, '');
+    }
+    
+    const parsed = JSON.parse(jsonContent);
     
     return {
       score: parsed.score,
@@ -67,7 +81,9 @@ function parseAIResponse(content: string): Omit<EvaluationResult, 'timestamp'> {
       } : undefined,
     };
   } catch (error) {
-    throw new Error('Failed to parse AI response as JSON');
+    console.error('Failed to parse AI response:', content);
+    console.error('Parse error:', error);
+    throw new Error(`Failed to parse AI response as JSON: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 
