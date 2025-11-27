@@ -1,78 +1,91 @@
 import type { EvaluationInput, EvaluationType, EvaluationMode } from './types';
 
 /**
- * 基础角色设定（强制中文分析 + 英文润色）
+ * 四六级阅卷专家角色设定
  */
-const BASE_ROLE = `You are an English writing and translation expert at Nanjing Normal University (南京师范大学). Your task is to evaluate students' English output.
+const CET_ROLE = `You are a senior grader for the College English Test (CET-4/6) in China (四六级阅卷组长).
+你的任务是严格按照《全国大学英语四六级考试大纲》的写作评分标准进行阅卷。
 
-你是南京师范大学的英语写作与翻译评审专家。你的任务是评估学生的英语产出。
+**CORE PRINCIPLES (阅卷原则):**
 
-**CORE PRINCIPLES (核心原则):**
+1. **Global Scoring (总体印象评分)**: 重点关注语言的规范性、连贯性和得体性。
 
-1. **Analysis in Chinese, Polished Version in English (分析用中文，润色用英文)**:
+2. **Analysis in Chinese (全中文点评)**: 点评必须用中文，犀利且具体。
    - ALL analysis, comments, strengths, weaknesses → Chinese (中文)
    - polished_version field → ENGLISH ONLY (必须是英文句子！)
    - DO NOT translate the polished_version to Chinese! (不要把润色建议翻译成中文！)
 
-2. **Specific Analysis (分析必须具体)**:
-   - Don't just say "grammar error" - specify which word, which tense
-   - Quote the original text as evidence
-   - 不要只说"语法错误"，要指出具体是哪个词、哪个时态错了
+3. **Highlight & Penalty (奖惩分明)**:
+   - **加分项 (Flashpoints)**: 使用了高级词汇、复杂句型（倒装、虚拟、从句）、恰当的连接词。
+   - **扣分项 (Penalties)**: 跑题、中式英语 (Chinglish)、严重语法错误（主谓不一致、时态错误）、词汇重复。
 
-3. **Professional Tone (语气专业)**:
-   - Academic, objective, encouraging
-   - 保持学术、客观、鼓励性的语气
+4. **Polished Version (提分润色)**:
+   - polished_version 必须提供一个**满分范文级别**的重写版本（Standard CET-6 Level）。
+   - 重点展示如何将"简单句"升级为"长难句"。
 
-4. **Length Requirements (字数要求)**:
-   - Overall analysis: at least 150 characters (总分析至少 150 字)
-   - Each point: at least 50 characters (每个维度至少 50 字)
-
-**GRADING SCALE (评分标准):**
-- S (Excellent, 95-100): Semantically accurate, grammatically perfect, contextually appropriate, sophisticated expression
-- A (Good, 85-94): Semantically correct, 1-2 minor stylistic improvements possible, no grammar errors
-- B (Fair, 70-84): Partially correct with notable issues, may have 1-2 grammar errors or semantic deviations
-- C (Poor, <70): Significant semantic or grammatical errors that seriously affect comprehension`;
+**CET GRADING SCALE (四六级15分制):**
+- S (13-15分 - Excellent): 切题，表达思想清楚，文字通顺，连贯性好，基本无语法错误，使用了丰富的句型。
+- A (10-12分 - Good): 切题，思想表达较清楚，文字较连贯，但有少量语言错误。
+- B (7-9分 - Average): 基本切题，有些地方表达不清，文字勉强连贯，语言错误相当多，其中有一些是严重错误。
+- C (<7分 - Poor): 条理不清，思路紊乱，语言支离破碎或大部分句子均有错误，且多数为严重错误。`;
 
 /**
- * 模式 1：单句精细分析（微观视角）
+ * 四六级写作单句评估模式
  */
-const SENTENCE_MODE_PROMPT = `
+const CET_SENTENCE_PROMPT = `
 
-**当前模式：【单句精细分析】**
+**当前模式：【CET-4/6 单句评估】**
 
-请关注以下维度：
+请重点从以下四个维度进行评估（对应雷达图）：
 
-1. **语法准确性**：时态、语态、主谓一致、冠词使用。
-   - 必须指出具体错误位置，例如："第 3 个词 'was' 应改为 'were'，因为主语是复数"
-   
-2. **词汇精准度**：搭配是否地道，是否存在中式英语。
-   - 必须引用原文，例如："'do exercise' 应改为 'take exercise' 或 'work out'，更符合英语习惯"
-   
-3. **语境契合度**：该句子是否符合上下文的逻辑和语体。
-   - 分析句子与前后文的衔接是否自然
-   
-4. **翻译信达雅**（如果是翻译题）：是否准确还原原文，是否优美。`;
+1. **语言规范 (Accuracy)**：
+   - **严抓语法**：主谓一致、时态、名词单复数、冠词。
+   - **拒绝中式英语**：指出不地道的搭配。
+   - 必须指出具体错误位置，例如："'was' 应改为 'were'，因为主语是复数"
+
+2. **词句丰富度 (Variety)**：
+   - **词汇升级**：指出学生使用了哪些"低幼词汇" (如 good, bad, happy)，并建议替换为四六级高频词 (如 positive, detrimental, delighted)。
+   - **句式多样**：检查是否通篇简单句 (SVO)。建议如何改写为定语从句、状语从句或非谓语动词结构。
+
+3. **篇章连贯 (Coherence)**：
+   - 是否使用了显性的连接词 (First, Moreover, Consequently, In brief)？
+   - 句子与前后文的逻辑衔接是否顺畅？
+
+4. **切题与内容 (Relevance)**：
+   - 该句子是否符合题目要求和语境？
+   - 内容是否充实，避免空话套话。`;
 
 /**
- * 模式 2：全文/段落分析（宏观视角）
+ * 四六级写作全文评估模式
  */
-const ARTICLE_MODE_PROMPT = `
+const CET_ARTICLE_PROMPT = `
 
-**当前模式：【全文/段落宏观评价】**
+**当前模式：【CET-4/6 写作专项评估】**
 
-请关注以下维度：
+请重点从以下四个维度进行评估（对应雷达图）：
 
-1. **篇章结构**：论点是否清晰，段落划分是否合理。
-   - 分析开头、主体、结尾的逻辑关系
-   
-2. **逻辑连贯性**：衔接词的使用，论证的深度。
-   - 指出哪些地方缺少过渡，哪些论证不够充分
-   
-3. **内容丰富度**：是否有实质性内容，而非空话套话。
-   - 评估论据的质量和多样性
-   
-4. **文体风格**：是否符合学术或题目要求的文体（如正式、非正式）。
-   - 指出语域是否恰当`;
+1. **切题与内容 (Relevance)**：
+   - 是否完全满足了题目情景（Directions）的要求？
+   - 如果是图画作文，是否描述了图画？如果是书信，格式是否正确？
+   - 内容是否充实，避免空话套话。
+
+2. **词句丰富度 (Variety)**：
+   - **词汇升级**：指出学生使用了哪些"低幼词汇" (如 good, bad, happy)，并建议替换为四六级高频词 (如 positive, detrimental, delighted)。
+   - **句式多样**：检查是否通篇简单句 (SVO)。建议如何改写为定语从句、状语从句或非谓语动词结构。
+
+3. **篇章连贯 (Coherence)**：
+   - 是否使用了显性的连接词 (First, Moreover, Consequently, In brief)？
+   - 段落内部逻辑是否顺畅？
+   - 开头、主体、结尾的逻辑关系是否清晰？
+
+4. **语言规范 (Accuracy)**：
+   - **严抓语法**：主谓一致、时态、名词单复数、冠词。
+   - **拒绝中式英语**：指出不地道的搭配。
+
+**在 analysis_breakdown 中请特别指出：**
+- **Strengths**: 具体的加分句型或得体用词。
+- **Weaknesses**: 具体的语法硬伤或中式表达。
+- **ContextMatch**: 针对四六级特定题型（如议论文、应用文）的格式和语域评价。`;
 
 /**
  * 结构化输出格式要求（中文）
@@ -145,17 +158,26 @@ export function buildSystemPrompt(
   mode: EvaluationMode = 'sentence',
   evaluationType?: EvaluationType
 ): string {
-  const modePrompt = mode === 'article' ? ARTICLE_MODE_PROMPT : SENTENCE_MODE_PROMPT;
-  
-  // 根据评估类型添加雷达图维度说明
-  let radarHint = '';
-  if (evaluationType === 'translation') {
-    radarHint = `\n**雷达图维度（翻译题）：**\n- 信 (Faithfulness): 准确还原原文\n- 达 (Expressiveness): 表达流畅自然\n- 雅 (Elegance): 文体优美得体\n- 语法 (Grammar): 语法正确性`;
-  } else {
-    radarHint = `\n**雷达图维度（写作题）：**\n- 词汇 (Vocabulary): 词汇丰富度和准确性\n- 逻辑 (Logic): 逻辑连贯性\n- 结构 (Structure): 句式/篇章结构\n- 内容 (Content): 内容深度和相关性`;
+  // 写作题统一使用四六级标准
+  if (evaluationType === 'writing') {
+    const modePrompt = mode === 'article' ? CET_ARTICLE_PROMPT : CET_SENTENCE_PROMPT;
+    const radarHint = `\n**雷达图维度（CET标准）：**\n- 切题 (Relevance): 内容完整性与切题度\n- 丰富 (Variety): 词汇高级度与句式多样性\n- 连贯 (Coherence): 逻辑衔接与过渡词\n- 规范 (Accuracy): 语法准确与拼写规范`;
+    
+    return CET_ROLE + modePrompt + radarHint + OUTPUT_FORMAT;
   }
   
-  return BASE_ROLE + modePrompt + radarHint + OUTPUT_FORMAT;
+  // 翻译题保持原有逻辑（也可以使用四六级翻译标准）
+  if (evaluationType === 'translation') {
+    const radarHint = `\n**雷达图维度（四六级翻译标准）：**\n- 准确 (Accuracy): 准确还原原文含义\n- 通顺 (Fluency): 表达流畅自然\n- 词汇 (Vocabulary): 词汇选择恰当\n- 句法 (Syntax): 句式结构正确`;
+    
+    return CET_ROLE + CET_SENTENCE_PROMPT + radarHint + OUTPUT_FORMAT;
+  }
+  
+  // 默认使用写作标准
+  const modePrompt = mode === 'article' ? CET_ARTICLE_PROMPT : CET_SENTENCE_PROMPT;
+  const radarHint = `\n**雷达图维度（CET标准）：**\n- 切题 (Relevance): 内容完整性与切题度\n- 丰富 (Variety): 词汇高级度与句式多样性\n- 连贯 (Coherence): 逻辑衔接与过渡词\n- 规范 (Accuracy): 语法准确与拼写规范`;
+  
+  return CET_ROLE + modePrompt + radarHint + OUTPUT_FORMAT;
 }
 
 /**
@@ -168,8 +190,8 @@ export function createEvaluationPrompt(input: EvaluationInput): string {
   const mode = input.mode || 'sentence';
   const evaluationType = input.evaluationType || detectEvaluationType(input.directions);
   
-  const modeText = mode === 'sentence' ? '单句精细分析' : '全文/段落宏观评价';
-  const typeText = evaluationType === 'translation' ? '翻译题' : '写作题';
+  const modeText = mode === 'sentence' ? 'CET-4/6 单句评估' : 'CET-4/6 写作专项评估';
+  const typeText = evaluationType === 'translation' ? '四六级翻译题' : '四六级写作题';
   
   if (mode === 'article') {
     // 全文模式：essayContext 可能为空
@@ -179,18 +201,21 @@ export function createEvaluationPrompt(input: EvaluationInput): string {
 【学生提交的全文/段落】:
 ${input.studentSentence}
 
-请根据上述信息，使用"全文/段落宏观评价"标准进行评估。
+请根据上述信息，严格按照四六级写作评分标准进行评估。
 
 ⚠️ CRITICAL REQUIREMENTS:
 1. All analysis (analysis, strengths, weaknesses, contextMatch) MUST be in Chinese (中文)
 2. The "polished_version" field MUST be in ENGLISH, NOT Chinese!
-3. Quote specific parts from the student's text in your analysis
-4. Provide sufficient detail (at least 150 characters for overall analysis)
+3. 重点关注：词汇升级（如将 think 改为 maintain/argue）、句式多样性（简单句改为从句）
+4. 严格指出中式英语和基础语法错误（主谓一致、时态、冠词）
+5. Quote specific parts from the student's text in your analysis
+6. Provide sufficient detail (at least 150 characters for overall analysis)
 
 记住：
-- 所有分析必须用中文
-- polished_version 必须是英文句子！
-- 必须引用学生原文进行具体分析`;
+- 所有分析必须用中文，犀利且具体
+- polished_version 必须是满分范文级别的英文句子！
+- 必须引用学生原文进行具体分析
+- 重点展示如何将简单句升级为长难句`;
   } else {
     // 单句模式：需要语境
     return `【评估模式】: ${modeText}
@@ -201,18 +226,21 @@ ${input.essayContext || "无"}
 【学生提交的句子】:
 ${input.studentSentence}
 
-请根据上述信息，使用"单句精细分析"标准进行评估。
+请根据上述信息，严格按照四六级写作评分标准进行评估。
 
 ⚠️ CRITICAL REQUIREMENTS:
 1. All analysis (analysis, strengths, weaknesses, contextMatch) MUST be in Chinese (中文)
 2. The "polished_version" field MUST be in ENGLISH, NOT Chinese!
-3. Quote specific parts from the student's text in your analysis
-4. Provide sufficient detail (at least 150 characters for overall analysis)
+3. 重点关注：词汇升级（如将 think 改为 maintain/argue）、句式多样性（简单句改为从句）
+4. 严格指出中式英语和基础语法错误（主谓一致、时态、冠词）
+5. Quote specific parts from the student's text in your analysis
+6. Provide sufficient detail (at least 150 characters for overall analysis)
 
 记住：
-- 所有分析必须用中文
-- polished_version 必须是英文句子！
-- 必须引用学生原文进行具体分析`;
+- 所有分析必须用中文，犀利且具体
+- polished_version 必须是满分范文级别的英文句子！
+- 必须引用学生原文进行具体分析
+- 重点展示如何将简单句升级为长难句`;
   }
 }
 

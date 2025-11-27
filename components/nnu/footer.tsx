@@ -1,7 +1,7 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import { Logo } from "./logo";
-import { ExternalLink, HelpCircle, Info } from "lucide-react";
+import { ExternalLink, HelpCircle, Info, Mail, Github } from "lucide-react";
 
 export interface FooterProps extends React.HTMLAttributes<HTMLElement> {}
 
@@ -66,13 +66,35 @@ export const Footer = React.forwardRef<HTMLElement, FooterProps>(
             </a>
           </div>
 
+          {/* Social Links */}
+          <div className="flex gap-4 justify-center mb-6">
+            <a
+              href="mailto:1516924835@qq.com"
+              className="footer-social-link group"
+              aria-label="发送邮件"
+            >
+              <Mail className="w-5 h-5 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12" />
+            </a>
+            <a
+              href="https://github.com/handsomeZR-netizen/nnu-smartwrite"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="footer-social-link group"
+              aria-label="访问 GitHub 仓库"
+            >
+              <Github className="w-5 h-5 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12" />
+            </a>
+          </div>
+
           {/* Divider */}
           <div className="w-24 h-px bg-white/20 mx-auto mb-6" />
 
           {/* Copyright */}
-          <p className="text-xs text-white/50">
-            &copy; {currentYear} Nanjing Normal University. SmartWrite Project
-            Team. All Rights Reserved.
+          <p className="text-xs text-white/50 mb-2">
+            &copy; {currentYear} 南京师范大学 SmartWrite 项目团队
+          </p>
+          <p className="text-xs text-white/40">
+            版权所有 · 保留所有权利
           </p>
         </div>
       </footer>

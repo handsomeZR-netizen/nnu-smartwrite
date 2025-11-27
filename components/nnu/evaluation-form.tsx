@@ -314,7 +314,7 @@ export function EvaluationForm({
           onBlur={() => handleFieldBlur("directions")}
           placeholder="例如: Translate the underlined sentence..."
           className={cn(
-            "min-h-[80px] bg-gray-50 border-gray-200 focus:ring-2 focus:ring-nnu-jade focus:border-transparent resize-none",
+            "directions-textarea min-h-[90px] bg-gray-50 border-gray-200 focus:ring-2 focus:ring-nnu-jade focus:border-transparent resize-none px-4 py-3",
             hasFieldError("directions") && "border-red-500 focus-visible:ring-red-500"
           )}
           disabled={isLoading}
@@ -341,9 +341,9 @@ export function EvaluationForm({
           onBlur={() => handleFieldBlur("essayContext")}
           onMouseUp={handleTextSelection}
           onKeyUp={handleTextSelection}
-          placeholder="粘贴文章全文，然后用鼠标选中需要评估的句子..."
+          placeholder="Paste your essay here, then select the sentence you want to evaluate..."
           className={cn(
-            "min-h-[200px] bg-nnu-paper border-nnu-gold/30 focus:ring-2 focus:ring-nnu-jade focus:border-transparent text-gray-700 resize-none leading-relaxed",
+            "english-textarea min-h-[240px] bg-nnu-paper border-nnu-gold/30 focus:ring-2 focus:ring-nnu-jade focus:border-transparent text-gray-800 resize-none px-5 py-4",
             hasFieldError("essayContext") && "border-red-500 focus-visible:ring-red-500"
           )}
           disabled={isLoading}

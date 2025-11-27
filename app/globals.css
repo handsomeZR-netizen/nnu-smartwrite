@@ -26,6 +26,7 @@
   /* Font Families */
   --font-sans: 'Inter', 'Noto Sans SC', ui-sans-serif, system-ui, sans-serif;
   --font-serif: 'Noto Serif SC', ui-serif, Georgia, serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
 }
 
 body {
@@ -88,10 +89,31 @@ body {
   transform: translateX(4px);
 }
 
-/* Feature Card Hover Effects */
+/* Feature Card Hover Effects with Spotlight */
 .feature-card {
   transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
   border: 2px solid transparent;
+  position: relative;
+  overflow: hidden;
+}
+
+.feature-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(31, 106, 82, 0.08) 0%,
+    transparent 40%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.feature-card:hover::before {
+  opacity: 1;
 }
 
 .feature-card:hover {
@@ -102,11 +124,18 @@ body {
 
 .feature-card .icon-wrapper {
   transition: transform 0.3s ease, background-color 0.3s ease;
+  position: relative;
+  z-index: 2;
 }
 
 .feature-card:hover .icon-wrapper {
   transform: scale(1.1) rotate(5deg);
   background-color: rgba(31, 106, 82, 0.15);
+}
+
+.feature-card > div {
+  position: relative;
+  z-index: 2;
 }
 
 /* Glassmorphism Navigation */
@@ -179,4 +208,149 @@ body {
   100% {
     background-position: 0% 50%;
   }
+}
+
+/* Custom Text Selection - Black Background */
+::selection {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+::-moz-selection {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+/* Enhanced Textarea Styles for English Content */
+.english-textarea {
+  font-family: 'Georgia', 'Times New Roman', 'Noto Serif', serif;
+  font-size: 1.0625rem; /* 17px */
+  line-height: 1.75;
+  letter-spacing: 0.01em;
+}
+
+.english-textarea::placeholder {
+  font-family: 'Inter', 'Noto Sans SC', sans-serif;
+  font-size: 0.9375rem; /* 15px */
+  font-style: italic;
+  opacity: 0.5;
+}
+
+/* Directions Input - Smaller but readable */
+.directions-textarea {
+  font-family: 'Inter', 'Noto Sans SC', sans-serif;
+  font-size: 0.9375rem; /* 15px */
+  line-height: 1.6;
+  letter-spacing: 0.005em;
+}
+
+.directions-textarea::placeholder {
+  font-size: 0.875rem; /* 14px */
+  font-style: italic;
+  opacity: 0.5;
+}
+
+/* Footer Social Links with Hover Effects */
+.footer-social-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.footer-social-link::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at center,
+    rgba(244, 184, 96, 0.3) 0%,
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.footer-social-link:hover {
+  background: rgba(244, 184, 96, 0.2);
+  border-color: rgba(244, 184, 96, 0.5);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(244, 184, 96, 0.3);
+}
+
+.footer-social-link:hover::before {
+  opacity: 1;
+}
+
+/* Spotlight Effect for Feature Cards - Enhanced Border Glow */
+.spotlight-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.spotlight-card::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  background: radial-gradient(
+    400px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(31, 106, 82, 0.3) 0%,
+    transparent 50%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 0;
+  border-radius: 1rem;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  padding: 2px;
+}
+
+.spotlight-card:hover::after {
+  opacity: 1;
+}
+
+/* Sliding Text Animation for Hero Motto */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-down {
+  animation: slideDown 0.6s ease-out forwards;
+}
+
+.animate-slide-down-delay-1 {
+  animation: slideDown 0.6s ease-out 0.1s forwards;
+  opacity: 0;
+}
+
+.animate-slide-down-delay-2 {
+  animation: slideDown 0.6s ease-out 0.2s forwards;
+  opacity: 0;
+}
+
+.animate-slide-down-delay-3 {
+  animation: slideDown 0.6s ease-out 0.3s forwards;
+  opacity: 0;
+}
+
+.animate-slide-down-delay-4 {
+  animation: slideDown 0.6s ease-out 0.4s forwards;
+  opacity: 0;
 }

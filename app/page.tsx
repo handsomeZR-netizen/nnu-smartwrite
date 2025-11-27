@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 import { Target, BarChart3, BookOpen, Sparkles, BrainCircuit, ScanSearch, ChartBar, ListChecks } from "lucide-react";
 import { MagneticButton } from "@/components/nnu/magnetic-button";
+import { Typewriter } from "@/components/nnu/typewriter";
 
 export default function Home() {
   return (
@@ -22,25 +23,29 @@ export default function Home() {
             <span className="text-white/90">Powered by DeepSeek-Reasoner AI</span>
           </div>
 
-          {/* Main Title */}
+          {/* Main Title with Sliding Animation */}
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-            <span className="block">SmartWrite</span>
-            <span className="block text-nnu-gold">AI赋能下的写作辅导与评价平台</span>
+            <span className="block animate-slide-down">SmartWrite</span>
+            <span className="block text-nnu-gold animate-slide-down-delay-1">
+              <Typewriter text="AI赋能下的写作辅导与评价平台" delay={80} />
+            </span>
           </h1>
 
-          {/* Subtitle */}
-          <p className="max-w-2xl mx-auto text-white/80 text-base md:text-lg mb-10 leading-relaxed">
+          {/* Subtitle with Sliding Animation */}
+          <p className="max-w-2xl mx-auto text-white/80 text-base md:text-lg mb-10 leading-relaxed animate-slide-down-delay-2">
             专为南京师范大学非英语专业学生打造的，具备自动评分、多维诊断、个性化反馈等功能的在线写作测评系统原型，
             <br className="hidden md:block" />
             支持南京师范大学学生自主练习与教师数据追踪。
           </p>
 
-          {/* CTA Button */}
-          <Link href="/evaluate">
-            <MagneticButton aria-label="开始英语写作评估">
-              开始智能评估
-            </MagneticButton>
-          </Link>
+          {/* CTA Button with Sliding Animation */}
+          <div className="animate-slide-down-delay-3">
+            <Link href="/evaluate">
+              <MagneticButton aria-label="开始英语写作评估">
+                开始智能评估
+              </MagneticButton>
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -50,7 +55,17 @@ export default function Home() {
         <h2 className="sr-only">平台特色功能</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
           {/* Card 1 */}
-          <Card className="feature-card bg-white rounded-2xl shadow-lg" role="article">
+          <Card 
+            className="feature-card spotlight-card bg-white rounded-2xl shadow-lg" 
+            role="article"
+            onMouseMove={(e) => {
+              const rect = e.currentTarget.getBoundingClientRect();
+              const x = e.clientX - rect.left;
+              const y = e.clientY - rect.top;
+              e.currentTarget.style.setProperty('--mouse-x', `${x}px`);
+              e.currentTarget.style.setProperty('--mouse-y', `${y}px`);
+            }}
+          >
             <CardContent className="pt-8 pb-8 px-6">
               <div className="icon-wrapper w-14 h-14 bg-nnu-green/10 rounded-xl flex items-center justify-center mb-5">
                 <Target className="w-7 h-7 text-nnu-green" />
@@ -65,7 +80,17 @@ export default function Home() {
           </Card>
 
           {/* Card 2 */}
-          <Card className="feature-card bg-white rounded-2xl shadow-lg" role="article">
+          <Card 
+            className="feature-card spotlight-card bg-white rounded-2xl shadow-lg" 
+            role="article"
+            onMouseMove={(e) => {
+              const rect = e.currentTarget.getBoundingClientRect();
+              const x = e.clientX - rect.left;
+              const y = e.clientY - rect.top;
+              e.currentTarget.style.setProperty('--mouse-x', `${x}px`);
+              e.currentTarget.style.setProperty('--mouse-y', `${y}px`);
+            }}
+          >
             <CardContent className="pt-8 pb-8 px-6">
               <div className="icon-wrapper w-14 h-14 bg-nnu-green/10 rounded-xl flex items-center justify-center mb-5">
                 <BarChart3 className="w-7 h-7 text-nnu-green" />
@@ -80,7 +105,17 @@ export default function Home() {
           </Card>
 
           {/* Card 3 */}
-          <Card className="feature-card bg-white rounded-2xl shadow-lg" role="article">
+          <Card 
+            className="feature-card spotlight-card bg-white rounded-2xl shadow-lg" 
+            role="article"
+            onMouseMove={(e) => {
+              const rect = e.currentTarget.getBoundingClientRect();
+              const x = e.clientX - rect.left;
+              const y = e.clientY - rect.top;
+              e.currentTarget.style.setProperty('--mouse-x', `${x}px`);
+              e.currentTarget.style.setProperty('--mouse-y', `${y}px`);
+            }}
+          >
             <CardContent className="pt-8 pb-8 px-6">
               <div className="icon-wrapper w-14 h-14 bg-nnu-green/10 rounded-xl flex items-center justify-center mb-5">
                 <BookOpen className="w-7 h-7 text-nnu-green" />

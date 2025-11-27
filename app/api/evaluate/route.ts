@@ -69,13 +69,15 @@ function extractJSON(content: string): string {
 }
 
 /**
- * 生成默认的雷达维度标签
+ * 生成默认的雷达维度标签（四六级标准）
  */
 function getDefaultRadarLabels(evaluationType?: EvaluationType): [string, string, string, string] {
   if (evaluationType === 'translation') {
-    return ['信 (Faithfulness)', '达 (Expressiveness)', '雅 (Elegance)', '语法 (Grammar)'];
+    // 四六级翻译标准：准确、通顺、词汇、句法
+    return ['准确 (Accuracy)', '通顺 (Fluency)', '词汇 (Vocabulary)', '句法 (Syntax)'];
   }
-  return ['词汇 (Vocabulary)', '逻辑 (Logic)', '结构 (Structure)', '内容 (Content)'];
+  // 四六级写作标准：切题、丰富、连贯、规范
+  return ['切题 (Relevance)', '丰富 (Variety)', '连贯 (Coherence)', '规范 (Accuracy)'];
 }
 
 /**
@@ -364,56 +366,58 @@ function generateMockResponse(evaluationType: EvaluationType): Omit<EvaluationRe
     return {
       score: 'A',
       isSemanticallyCorrect: true,
-      analysis: '【测试模式】翻译整体准确，表达流畅。建议：可以使用更地道的英文表达。',
+      analysis: '【测试模式 - 四六级翻译标准】翻译整体准确，表达流畅。建议：可以使用更地道的英文表达，避免中式英语。',
       analysisBreakdown: {
         strengths: [
-          '准确传达了原文含义',
-          '语法正确无误',
-          '用词恰当'
+          '准确传达了原文含义，没有遗漏关键信息',
+          '语法正确无误，时态使用恰当',
+          '用词基本恰当，符合英语表达习惯'
         ],
         weaknesses: [
-          '部分表达略显生硬，可以更自然'
+          '部分表达略显生硬，如可以将 "very good" 改为 "exceedingly beneficial"',
+          '句式较为简单，可以尝试使用从句增加句式多样性'
         ],
-        contextMatch: '与文章语境高度契合'
+        contextMatch: '符合四六级翻译题的语域要求，表达较为正式'
       },
-      polishedVersion: '【测试模式】This is a polished version of your translation.',
+      polishedVersion: '【测试模式】This is a polished version of your translation with more sophisticated vocabulary and varied sentence structures.',
       radarDimensions: {
         dim1: 90,
         dim2: 85,
         dim3: 82,
-        dim4: 95,
-        labels: ['信 (Faithfulness)', '达 (Expressiveness)', '雅 (Elegance)', '语法 (Grammar)']
+        dim4: 88,
+        labels: ['准确 (Accuracy)', '通顺 (Fluency)', '词汇 (Vocabulary)', '句法 (Syntax)']
       },
       evaluationType: 'translation',
-      reasoningProcess: '【测试模式】首先分析了原文的核心含义，然后评估译文的准确性和流畅度...'
+      reasoningProcess: '【测试模式】按照四六级翻译标准，首先检查了译文的准确性，然后评估了表达的流畅度和词汇句法的质量...'
     };
   } else {
     return {
       score: 'A',
       isSemanticallyCorrect: true,
-      analysis: '【测试模式】写作内容充实，逻辑清晰。建议：可以使用更丰富的词汇。',
+      analysis: '【测试模式 - 四六级写作标准】作文切题，内容充实，语言较为规范。建议：进一步提升词汇丰富度，使用更多高级词汇和复杂句型。',
       analysisBreakdown: {
         strengths: [
-          '逻辑连贯，论述清晰',
-          '句式结构良好',
-          '内容切题'
+          '切题性好，完全符合题目要求',
+          '使用了一些连接词（如 First, Moreover），逻辑较为连贯',
+          '基本没有严重的语法错误，主谓一致、时态使用正确'
         ],
         weaknesses: [
-          '词汇可以更加多样化',
-          '部分句子可以更简洁'
+          '词汇较为简单，多次使用 "think"、"good" 等低幼词汇，建议替换为 "maintain"、"positive" 等四六级高频词',
+          '句式单一，多为简单句（SVO），建议改写为定语从句或状语从句，如 "I think it is good" 可改为 "It is widely acknowledged that..."',
+          '部分表达存在中式英语痕迹'
         ],
-        contextMatch: '与主题紧密相关'
+        contextMatch: '符合四六级议论文的格式要求，语域恰当'
       },
-      polishedVersion: '【测试模式】This is a polished version with improved vocabulary and structure.',
+      polishedVersion: '【测试模式】This is a polished version with advanced vocabulary (e.g., "maintain" instead of "think") and complex sentence structures (e.g., subordinate clauses and non-finite verbs).',
       radarDimensions: {
-        dim1: 85,
-        dim2: 88,
-        dim3: 82,
+        dim1: 88,
+        dim2: 82,
+        dim3: 85,
         dim4: 90,
-        labels: ['词汇 (Vocabulary)', '逻辑 (Logic)', '结构 (Structure)', '内容 (Content)']
+        labels: ['切题 (Relevance)', '丰富 (Variety)', '连贯 (Coherence)', '规范 (Accuracy)']
       },
       evaluationType: 'writing',
-      reasoningProcess: '【测试模式】分析了句子的词汇选择、逻辑结构和内容深度...'
+      reasoningProcess: '【测试模式】按照四六级写作标准，首先检查了切题性和内容完整性，然后重点分析了词汇和句式的丰富度，最后评估了语言规范性...'
     };
   }
 }
