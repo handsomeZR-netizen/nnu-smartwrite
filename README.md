@@ -1,4 +1,34 @@
-# NNU-SmartWrite (南师智评)
+# Nnu Smartwrite
+
+<!-- PORTFOLIO-SNAPSHOT:START -->
+<p align="left">
+  <img src="https://img.shields.io/badge/category-Education%20technology%20project-blue" alt="Category" />
+  <img src="https://img.shields.io/badge/status-Public%20portfolio%20artifact-2ea44f" alt="Status" />
+</p>
+
+> DeepSeek-powered English writing assessment system with semantic scoring, CET-style evaluation, and teacher-facing feedback flows.
+
+## Project Snapshot
+
+- Category: Education technology project
+- Stack: TypeScript, deepseek, education-technology, english-writing, llm, nextjs
+- Status: Public portfolio artifact
+
+## What This Demonstrates
+
+- Presents the project with a clear purpose, technology stack, and review path.
+- Shows applied AI workflow design in a concrete product or learning scenario.
+- Demonstrates frontend delivery, deployment awareness, and user-facing product structure.
+
+## Quick Start
+
+```bash
+npm install && npm run build
+```
+
+<!-- PORTFOLIO-SNAPSHOT:END -->
+
+## Original Documentation
 
 AI驱动的英语写作评价平台，专为南京师范大学学生设计。
 
