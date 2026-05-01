@@ -87,7 +87,7 @@ export const RadarChart: React.FC<RadarChartProps> = ({
             if (e && e.activeLabel && onDimensionClick) {
               const index = data.findIndex(d => d.subject === e.activeLabel);
               if (index !== -1) {
-                onDimensionClick(e.activeLabel, index);
+                onDimensionClick(String(e.activeLabel), index);
               }
             }
           }}

@@ -25,9 +25,9 @@ export interface EvaluationInput {
  * 评估输入验证Schema
  */
 export const EvaluationInputSchema = z.object({
-  directions: z.string().trim().min(1, '题目要求不能为空').max(500, '题目要求不能超过500字符'),
-  essayContext: z.string().trim().max(2000, '文章语境不能超过2000字符'), // 全文模式下可以为空
-  studentSentence: z.string().trim().min(1, '学生答案不能为空').max(1000, '学生答案不能超过1000字符'),
+  directions: z.string().trim().min(1, '题目要求不能为空').max(1000, '题目要求不能超过1000字符'),
+  essayContext: z.string().trim().max(8000, '文章语境不能超过8000字符'), // 全文模式下可以为空
+  studentSentence: z.string().trim().min(1, '学生答案不能为空').max(8000, '学生答案不能超过8000字符'),
   evaluationType: z.enum(['translation', 'writing']).optional(),
   mode: z.enum(['sentence', 'article']).optional().default('sentence'),
 });

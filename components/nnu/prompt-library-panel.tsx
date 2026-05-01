@@ -54,6 +54,7 @@ export const PromptLibraryPanel: React.FC<PromptLibraryPanelProps> = ({
   const handleApply = (t: PromptTemplate) => {
     onApply(t);
     setAppliedId(t.id);
+    setOpen(false);
     setTimeout(() => setAppliedId(null), 2000);
   };
 
