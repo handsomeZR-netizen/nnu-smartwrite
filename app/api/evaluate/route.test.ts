@@ -359,6 +359,107 @@ describe('API Route - Unit Tests', () => {
   });
 
   /**
+   * 单元测试：spelling 类的 span 偏移时，后端会用 suggestion 反查近邻拼写错误并修正
+   */
+  it('should auto-correct spelling span when AI returns wrong offset', async () => {
+    const text2 = 'I wil go to school tomorrow but no other plans yet today.';
+    // "wil" 真实位置在 [2, 5)；模拟 AI 偏移到了 [12, 15)，切出来是 "sch"
+    // 因为 "sch" 不属于 suggestion="will" 的近邻变体集合（{will, ill, wll, wil, willl, iwll, will, ...}），
+    // normalizeIssue 应当回退到 findCorrectedSpan 反查并修正到真实位置 [2, 5)。
+    expect(text2.slice(12, 15)).toBe('sch');
+    expect(text2.slice(2, 5)).toBe('wil');
+
+    const aiResponse = {
+      score: 'A',
+      numeric_score: 80,
+      is_semantically_correct: true,
+      analysis: '整体不错。',
+      polished_version: 'A polished English sentence.',
+      sentence_annotations: [
+        {
+          sentence_index: 0,
+          text: text2,
+          issues: [
+            {
+              type: 'spelling',
+              span: [12, 15], // 错位置 (sch)
+              message: '应为 "will"',
+              suggestion: 'will',
+            },
+          ],
+        },
+      ],
+    };
+
+    global.fetch = mockDeepSeekResponse(JSON.stringify(aiResponse));
+
+    const request = new NextRequest('http://localhost:3000/api/evaluate', {
+      method: 'POST',
+      body: JSON.stringify({
+        directions: 'Write',
+        essayContext: 'ctx',
+        studentSentence: text2,
+      }),
+    });
+
+    const response = await POST(request);
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data.sentenceAnnotations).toHaveLength(1);
+    const issue = data.sentenceAnnotations[0].issues[0];
+    expect(issue.type).toBe('spelling');
+    // span 应被修正回 "wil" 的真实位置
+    expect(issue.span).toEqual([2, 5]);
+    expect(text2.slice(issue.span[0], issue.span[1])).toBe('wil');
+  });
+
+  /**
+   * 单元测试：spelling 类的 span 已经命中真实单词时，不要乱改
+   */
+  it('should keep correct spelling span untouched when AI got it right', async () => {
+    const text = 'I wil go to school.';
+    const aiResponse = {
+      score: 'A',
+      numeric_score: 80,
+      is_semantically_correct: true,
+      analysis: 'ok',
+      polished_version: 'ok',
+      sentence_annotations: [
+        {
+          sentence_index: 0,
+          text,
+          issues: [
+            {
+              type: 'spelling',
+              span: [2, 5], // 真实正确位置
+              message: '应为 will',
+              suggestion: 'will',
+            },
+          ],
+        },
+      ],
+    };
+
+    global.fetch = mockDeepSeekResponse(JSON.stringify(aiResponse));
+
+    const request = new NextRequest('http://localhost:3000/api/evaluate', {
+      method: 'POST',
+      body: JSON.stringify({
+        directions: 'Write',
+        essayContext: 'ctx',
+        studentSentence: text,
+      }),
+    });
+
+    const response = await POST(request);
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data.sentenceAnnotations[0].issues[0].span).toEqual([2, 5]);
+  });
+
+  /**
    * 单元测试：numeric_score 越界时被丢弃
    */
   it('should drop numeric_score when out of [0,100]', async () => {

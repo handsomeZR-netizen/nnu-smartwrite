@@ -141,8 +141,25 @@ You MUST respond with valid JSON in this EXACT format (no markdown code blocks):
 - 把学生原文按句号 / 问号 / 感叹号切句，按出现顺序填入 sentence_annotations。sentence_index 从 0 开始递增。
 - 每个 sentence_annotations 项的 "text" 必须与切出的原句逐字一致（不要修正拼写、不要补标点）。
 - "issues" 中每条的 "span" 用 [start, end) **半开区间**（end 不包含），相对于该句 "text" 的字符索引；必须满足 0 ≤ start < end ≤ text.length。
+
+  **不要凭直觉估算 start，按下面三步严格计算：**
+
+    Step 1: 把要标注的目标错误片段原样写出来（包括标点 / 空格 / 大小写）。
+    Step 2: 从该句的第 0 个字符（首字符）开始，**逐字数**到该片段首字符的偏移作为 start。半角空格、逗号、点号都各算一个字符。
+    Step 3: end = start + 该片段的字符长度。
+
+  例：text = "no matter where they happen to be, wil go to great lengths"，
+       目标片段 = "wil"。
+       从 0 数过去："n"=0, "o"=1, " "=2, "m"=3, "a"=4, "t"=5, "t"=6, "e"=7, "r"=8, " "=9, ...
+       一直数到 "wil" 的首字母 "w" 出现在位置 35。
+       所以 span = [35, 35 + len("wil")] = [35, 38]。
+       验证：text.slice(35, 38) === "wil" ✓ —— 输出前请在心里做这一步验证。
+
+  **关键提醒**：宁可漏标也不要乱标位置。如果你不确定字符偏移，宁可把这条 issue 删掉，也不要返回错误的 span。
+
 - 每句的 "issues" 数组最多 3 条；如果该句无明显错误，issues 留空数组 []。
 - type 取值固定为下列五选一：grammar（语法）、spelling（拼写）、vocab（词汇/搭配）、style（文体/中式英语）、logic（逻辑/衔接）。
+- 对于 spelling 类型，**suggestion 字段必填**，写正确拼写（如 "will"），方便后端回查。
 - 整篇的 numeric_score（0-100 整数）须与等级 S/A/B/C 大致一致（S≥85、A 70-84、B 55-69、C<55）。
 
 **CRITICAL RULES (重要规则):**

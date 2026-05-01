@@ -115,13 +115,63 @@ const VALID_ISSUE_TYPES: ReadonlySet<IssueType> = new Set([
 ]);
 
 /**
+ * 给定 suggestion (正确拼写)，生成它的近邻拼写错误候选：
+ * 1) 自身（万一原词本身没拼错只是 AI 误判）
+ * 2) 删除任一位 (deletion)
+ * 3) 重复任一位 (insertion of same letter)
+ * 4) 相邻字母对调 (adjacent transposition)
+ * 用于在原文里反查 spelling 错误的真实位置。
+ */
+function generateNearbyVariants(word: string): string[] {
+  const variants = new Set<string>([word]);
+  for (let i = 0; i < word.length; i++) {
+    variants.add(word.slice(0, i) + word.slice(i + 1));
+    variants.add(word.slice(0, i + 1) + word[i] + word.slice(i + 1));
+  }
+  for (let i = 0; i < word.length - 1; i++) {
+    variants.add(word.slice(0, i) + word[i + 1] + word[i] + word.slice(i + 2));
+  }
+  return Array.from(variants).filter((v) => v.length >= 2);
+}
+
+function escapeRegex(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/**
+ * 在 text 全文里搜索 suggestion 的近邻拼写错误，命中即返回真实 span；找不到返回 null。
+ * 仅当 suggestion 是纯英文单词（含连字符 / 撇号）时才执行。
+ */
+function findCorrectedSpan(
+  text: string,
+  suggestion: string
+): [number, number] | null {
+  if (!/^[a-zA-Z'-]+$/.test(suggestion)) return null;
+  const variants = generateNearbyVariants(suggestion).sort(
+    (a, b) =>
+      Math.abs(a.length - suggestion.length) -
+      Math.abs(b.length - suggestion.length)
+  );
+  for (const v of variants) {
+    const re = new RegExp(`\\b${escapeRegex(v)}\\b`);
+    const m = text.match(re);
+    if (m && m.index !== undefined) {
+      return [m.index, m.index + v.length];
+    }
+  }
+  return null;
+}
+
+/**
  * 校验单个 issue：
  * - type 必须在白名单
  * - span = [start, end] 满足 0 ≤ start < end ≤ text.length
  * - message 非空字符串
+ * - 对于 spelling 类型且带 suggestion 的 issue，若 AI 给的 span 切出来不像有意义的英文片段，
+ *   会尝试在 text 里反查 suggestion 的近邻变体并修正 span（防御层）
  * 不合法时返回 null，由调用方丢弃。
  */
-function normalizeIssue(raw: unknown, textLength: number): IssueSpan | null {
+function normalizeIssue(raw: unknown, text: string): IssueSpan | null {
   if (!raw || typeof raw !== 'object') return null;
   const r = raw as Record<string, unknown>;
 
@@ -130,10 +180,10 @@ function normalizeIssue(raw: unknown, textLength: number): IssueSpan | null {
 
   const spanRaw = r.span;
   if (!Array.isArray(spanRaw) || spanRaw.length !== 2) return null;
-  const start = Number(spanRaw[0]);
-  const end = Number(spanRaw[1]);
-  if (!Number.isFinite(start) || !Number.isFinite(end)) return null;
-  if (!(start >= 0 && end > start && end <= textLength)) return null;
+  const startRaw = Number(spanRaw[0]);
+  const endRaw = Number(spanRaw[1]);
+  if (!Number.isFinite(startRaw) || !Number.isFinite(endRaw)) return null;
+  if (!(startRaw >= 0 && endRaw > startRaw && endRaw <= text.length)) return null;
 
   const message = typeof r.message === 'string' ? r.message.trim() : '';
   if (!message) return null;
@@ -143,9 +193,22 @@ function normalizeIssue(raw: unknown, textLength: number): IssueSpan | null {
       ? r.suggestion.trim()
       : undefined;
 
+  let span: [number, number] = [Math.floor(startRaw), Math.floor(endRaw)];
+
+  if (type === 'spelling' && suggestion) {
+    const sliced = text.slice(span[0], span[1]);
+    const variants = new Set(generateNearbyVariants(suggestion));
+    // 只有当 AI 切出来的子串本身就是 suggestion 的近邻拼写错误时，才相信它；
+    // 否则在原文里搜近邻变体并修正 span。
+    if (!variants.has(sliced)) {
+      const corrected = findCorrectedSpan(text, suggestion);
+      if (corrected) span = corrected;
+    }
+  }
+
   return {
     type: type as IssueType,
-    span: [Math.floor(start), Math.floor(end)],
+    span,
     message,
     suggestion,
   };
@@ -175,7 +238,7 @@ function normalizeSentenceAnnotations(raw: unknown): SentenceAnnotation[] | unde
     const issuesRaw = Array.isArray(r.issues) ? r.issues : [];
     const issues: IssueSpan[] = [];
     for (const iss of issuesRaw) {
-      const norm = normalizeIssue(iss, text.length);
+      const norm = normalizeIssue(iss, text);
       if (norm) issues.push(norm);
       if (issues.length >= 3) break; // 每句最多 3 条
     }
