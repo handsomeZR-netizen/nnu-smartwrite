@@ -415,6 +415,106 @@ describe('API Route - Unit Tests', () => {
   });
 
   /**
+   * 单元测试：style/vocab 类（无 suggestion 反推路径）也能用 message 引号短语修正 span
+   */
+  it('should auto-correct style/vocab span via quoted phrase in message', async () => {
+    const text = 'It blends singing into a seamless whole, with perform-ers giving life to characters.';
+    // "perform-ers" 真实位置：let me compute
+    const realStart = text.indexOf('perform-ers');
+    expect(realStart).toBeGreaterThan(0);
+
+    const aiResponse = {
+      score: 'A',
+      numeric_score: 80,
+      is_semantically_correct: true,
+      analysis: 'ok',
+      polished_version: 'ok',
+      sentence_annotations: [
+        {
+          sentence_index: 0,
+          text,
+          issues: [
+            {
+              type: 'style',
+              span: [5, 8], // 错位置 ("end")
+              message: "连字符使用不当：'perform-ers'应直接写为'performers'",
+              suggestion: 'performers',
+            },
+          ],
+        },
+      ],
+    };
+
+    global.fetch = mockDeepSeekResponse(JSON.stringify(aiResponse));
+
+    const request = new NextRequest('http://localhost:3000/api/evaluate', {
+      method: 'POST',
+      body: JSON.stringify({
+        directions: 'Write',
+        essayContext: 'ctx',
+        studentSentence: text,
+      }),
+    });
+
+    const response = await POST(request);
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    const issue = data.sentenceAnnotations[0].issues[0];
+    expect(issue.type).toBe('style');
+    expect(issue.span).toEqual([realStart, realStart + 'perform-ers'.length]);
+    expect(text.slice(issue.span[0], issue.span[1])).toBe('perform-ers');
+  });
+
+  /**
+   * 单元测试：Chinese curly quotes 在 message 里也能被正确解析
+   */
+  it('should handle Chinese curly quotes in message', async () => {
+    const text = 'I think wil go to school now is best.';
+    const realStart = text.indexOf('wil');
+
+    const aiResponse = {
+      score: 'B',
+      numeric_score: 65,
+      is_semantically_correct: true,
+      analysis: 'ok',
+      polished_version: 'ok',
+      sentence_annotations: [
+        {
+          sentence_index: 0,
+          text,
+          issues: [
+            {
+              type: 'spelling',
+              span: [0, 3], // 错位置
+              message: '拼写错误：‘wil’应为‘will’', // U+2018 / U+2019
+              suggestion: 'will',
+            },
+          ],
+        },
+      ],
+    };
+
+    global.fetch = mockDeepSeekResponse(JSON.stringify(aiResponse));
+
+    const request = new NextRequest('http://localhost:3000/api/evaluate', {
+      method: 'POST',
+      body: JSON.stringify({
+        directions: 'Write',
+        essayContext: 'ctx',
+        studentSentence: text,
+      }),
+    });
+
+    const response = await POST(request);
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    const issue = data.sentenceAnnotations[0].issues[0];
+    expect(issue.span).toEqual([realStart, realStart + 3]);
+  });
+
+  /**
    * 单元测试：spelling 类的 span 已经命中真实单词时，不要乱改
    */
   it('should keep correct spelling span untouched when AI got it right', async () => {

@@ -163,12 +163,54 @@ function findCorrectedSpan(
 }
 
 /**
+ * 从 issue.message 里抽取被引号包裹的字面短语。
+ * 支持 ASCII 单/双引号 + 中文弯引号（U+2018/U+2019/U+201C/U+201D）。
+ * AI 的 message 里通常会引用原文片段（例 "拼写错误：'wil'应为'will'"），
+ * 即使字符 offset 算偏，引号内的字面词通常是对的，可以拿来反查真实位置。
+ */
+function extractQuotedPhrases(message: string): string[] {
+  const out: string[] = [];
+  const patterns = [
+    /'([^']{2,})'/g,
+    /"([^"]{2,})"/g,
+    /‘([^‘’]{2,})’/g,
+    /“([^“”]{2,})”/g,
+  ];
+  for (const re of patterns) {
+    let m: RegExpExecArray | null;
+    while ((m = re.exec(message)) !== null) {
+      const phrase = m[1].trim();
+      if (phrase.length >= 2 && !out.includes(phrase)) out.push(phrase);
+    }
+  }
+  return out;
+}
+
+/**
+ * 用 message 里引号包裹的字面短语在原文中反查真实 span。
+ * 优先返回长度更长的短语（更具体、不易歧义）；找不到返回 null。
+ */
+function findSpanByQuotedPhrase(
+  text: string,
+  message: string
+): [number, number] | null {
+  const phrases = extractQuotedPhrases(message).sort(
+    (a, b) => b.length - a.length
+  );
+  for (const p of phrases) {
+    const idx = text.indexOf(p);
+    if (idx >= 0) return [idx, idx + p.length];
+  }
+  return null;
+}
+
+/**
  * 校验单个 issue：
  * - type 必须在白名单
  * - span = [start, end] 满足 0 ≤ start < end ≤ text.length
  * - message 非空字符串
- * - 对于 spelling 类型且带 suggestion 的 issue，若 AI 给的 span 切出来不像有意义的英文片段，
- *   会尝试在 text 里反查 suggestion 的近邻变体并修正 span（防御层）
+ * - 防御层：AI 的字符 offset 经常算偏。如果 AI 切出来的子串不在 message 引用的字面短语集合里，
+ *   会优先用 message 里引号包裹的短语在原文反查 span；spelling 类还有 suggestion 近邻变体兜底。
  * 不合法时返回 null，由调用方丢弃。
  */
 function normalizeIssue(raw: unknown, text: string): IssueSpan | null {
@@ -194,15 +236,22 @@ function normalizeIssue(raw: unknown, text: string): IssueSpan | null {
       : undefined;
 
   let span: [number, number] = [Math.floor(startRaw), Math.floor(endRaw)];
+  const sliced = text.slice(span[0], span[1]);
 
-  if (type === 'spelling' && suggestion) {
-    const sliced = text.slice(span[0], span[1]);
-    const variants = new Set(generateNearbyVariants(suggestion));
-    // 只有当 AI 切出来的子串本身就是 suggestion 的近邻拼写错误时，才相信它；
-    // 否则在原文里搜近邻变体并修正 span。
-    if (!variants.has(sliced)) {
-      const corrected = findCorrectedSpan(text, suggestion);
-      if (corrected) span = corrected;
+  // 通用兜底：用 message 里引号包裹的字面短语反查
+  // 仅当 AI 切出来的子串本身不属于这些短语时才覆盖
+  const quotedPhrases = extractQuotedPhrases(message);
+  if (!quotedPhrases.includes(sliced)) {
+    const bySnippet = findSpanByQuotedPhrase(text, message);
+    if (bySnippet) {
+      span = bySnippet;
+    } else if (type === 'spelling' && suggestion) {
+      // spelling 兜底：从 suggestion 反推 edit-distance-1 变体
+      const variants = new Set(generateNearbyVariants(suggestion));
+      if (!variants.has(sliced)) {
+        const corrected = findCorrectedSpan(text, suggestion);
+        if (corrected) span = corrected;
+      }
     }
   }
 
@@ -534,26 +583,19 @@ async function callDeepSeekAPI(
     const reasoningContent = message?.reasoning_content;
     
     // 如果 content 为空但有 reasoning_content，尝试从 reasoning_content 中提取 JSON
+    // 注意：绝对不能直接把 reasoning_content 当 analysis 暴露给前端——那会泄露模型链式思考过程。
     if (!content && reasoningContent) {
-      console.log('Content is empty, trying to extract from reasoning_content');
-      // 尝试从 reasoning_content 中找到 JSON
       const jsonMatch = reasoningContent.match(/\{[\s\S]*"score"[\s\S]*\}/);
       if (jsonMatch) {
         content = jsonMatch[0];
       } else {
-        // 如果没有找到 JSON，使用 reasoning_content 作为分析内容
+        // 没找到结构化 JSON：返回最小可用结果 + 提示用户切换到极速模式重试，不要泄露 reasoning_content。
         content = JSON.stringify({
           score: 'B',
           is_semantically_correct: true,
-          analysis: reasoningContent.substring(0, 1000),
+          analysis:
+            '本次评测未能解析出结构化结果。这通常发生在思考模式（深度思考 / 极致）时模型超出输出长度。建议切换到「极速」模式或将思考强度调回「标准」后重新评测。',
           polished_version: '',
-          radar_dimensions: {
-            dim1: 75,
-            dim2: 75,
-            dim3: 75,
-            dim4: 75,
-            labels: ['维度1', '维度2', '维度3', '维度4']
-          }
         });
       }
     }
