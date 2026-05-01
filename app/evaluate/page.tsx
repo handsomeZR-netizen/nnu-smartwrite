@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import type { EvaluationInput, EvaluationResult, APIError } from "@/lib/types";
 import { saveToHistory } from "@/lib/storage";
 import { ResultCardSkeleton } from "@/components/nnu/skeletons";
-import { Activity, GraduationCap, AlertTriangle, RotateCcw, ArrowLeft, Trash2 } from "lucide-react";
+import { Activity, GraduationCap, AlertTriangle, RotateCcw, ArrowLeft, Trash2, Printer } from "lucide-react";
+import { FollowUpChat } from "@/components/nnu/followup-chat";
 
 const ResultCard = dynamic(
   () => import("@/components/nnu/result-card").then(mod => mod.ResultCard),
@@ -230,14 +231,26 @@ export default function EvaluatePage() {
             )}
 
             {/* 结果展示 */}
-            {result && (
+            {result && currentInput && (
               <div className="space-y-4">
-                <ResultCard result={result} showRadarChart={!!(result.radarScores || result.radarDimensions)} />
-                
-                {/* 清空按钮 */}
-                <div className="flex justify-center">
-                  <Button 
-                    onClick={handleReset} 
+                <div id="evaluation-printable">
+                  <ResultCard result={result} showRadarChart={!!(result.radarScores || result.radarDimensions)} />
+                </div>
+
+                <FollowUpChat input={currentInput} result={result} />
+
+                {/* 操作按钮 */}
+                <div className="flex flex-wrap gap-3 justify-center print:hidden">
+                  <Button
+                    onClick={() => typeof window !== "undefined" && window.print()}
+                    variant="outline"
+                    className="text-nnu-green border-nnu-green hover:bg-nnu-green/10"
+                  >
+                    <Printer className="w-4 h-4 mr-2" />
+                    导出报告 (PDF)
+                  </Button>
+                  <Button
+                    onClick={handleReset}
                     variant="outline"
                     className="text-gray-600 hover:text-red-600 hover:border-red-300"
                   >

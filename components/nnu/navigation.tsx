@@ -2,15 +2,53 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Logo } from "./logo";
 import { cn } from "@/lib/utils";
-import { Menu, X, History, BookOpen, Home, Settings } from "lucide-react";
+import {
+  Menu,
+  X,
+  History,
+  BookOpen,
+  Home,
+  Settings,
+  User,
+  LogIn,
+  LogOut,
+  UserPlus,
+} from "lucide-react";
+import { useAuth } from "@/lib/use-auth";
+import { logoutUser } from "@/lib/auth";
 
 export interface NavigationProps extends React.HTMLAttributes<HTMLElement> {}
 
 export const Navigation = React.forwardRef<HTMLElement, NavigationProps>(
   ({ className, ...props }, ref) => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
+    const [isUserMenuOpen, setIsUserMenuOpen] = React.useState(false);
+    const userMenuRef = React.useRef<HTMLDivElement | null>(null);
+    const router = useRouter();
+    const { user, isReady } = useAuth();
+
+    React.useEffect(() => {
+      if (!isUserMenuOpen) return;
+      const onDocClick = (e: MouseEvent) => {
+        if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+          setIsUserMenuOpen(false);
+        }
+      };
+      document.addEventListener("mousedown", onDocClick);
+      return () => document.removeEventListener("mousedown", onDocClick);
+    }, [isUserMenuOpen]);
+
+    const initial = user?.displayName?.[0]?.toUpperCase() || "我";
+
+    const handleLogout = () => {
+      logoutUser();
+      setIsUserMenuOpen(false);
+      setIsMobileMenuOpen(false);
+      router.push("/");
+    };
 
     return (
       <nav
@@ -87,6 +125,70 @@ export const Navigation = React.forwardRef<HTMLElement, NavigationProps>(
               <Settings className="w-4 h-4" />
               设置
             </Link>
+
+            {/* Auth area */}
+            <div className="ml-2 pl-2 border-l border-white/15">
+              {isReady && user ? (
+                <div className="relative" ref={userMenuRef}>
+                  <button
+                    type="button"
+                    onClick={() => setIsUserMenuOpen((v) => !v)}
+                    className="flex items-center gap-2 hover:bg-white/10 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-nnu-gold rounded-lg px-3 py-2"
+                    aria-haspopup="menu"
+                    aria-expanded={isUserMenuOpen}
+                  >
+                    <span className="w-8 h-8 rounded-full bg-nnu-gold text-nnu-green flex items-center justify-center font-bold text-sm">
+                      {initial}
+                    </span>
+                    <span className="text-sm max-w-[100px] truncate">
+                      {user.displayName}
+                    </span>
+                  </button>
+                  {isUserMenuOpen && (
+                    <div
+                      role="menu"
+                      className="absolute right-0 mt-2 w-44 bg-white text-gray-700 rounded-lg shadow-lg ring-1 ring-black/5 overflow-hidden z-50"
+                    >
+                      <Link
+                        href="/profile"
+                        className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-nnu-paper"
+                        onClick={() => setIsUserMenuOpen(false)}
+                        role="menuitem"
+                      >
+                        <User className="w-4 h-4" />
+                        个人中心
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={handleLogout}
+                        className="w-full flex items-center gap-2 px-4 py-2 text-sm hover:bg-nnu-paper text-left"
+                        role="menuitem"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        退出登录
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="flex items-center gap-1">
+                  <Link
+                    href="/login"
+                    className="flex items-center gap-1.5 hover:bg-white/10 hover:text-nnu-gold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-nnu-gold rounded-lg px-3 py-2 text-sm"
+                  >
+                    <LogIn className="w-4 h-4" />
+                    登录
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="flex items-center gap-1.5 bg-nnu-gold text-nnu-green hover:bg-nnu-gold/90 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white rounded-lg px-3 py-2 text-sm font-semibold"
+                  >
+                    <UserPlus className="w-4 h-4" />
+                    注册
+                  </Link>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Mobile Menu Button */}
@@ -150,6 +252,54 @@ export const Navigation = React.forwardRef<HTMLElement, NavigationProps>(
               <Settings className="w-5 h-5" />
               设置
             </Link>
+
+            <div className="border-t border-white/10 mt-2 pt-2">
+              {isReady && user ? (
+                <>
+                  <Link
+                    href="/profile"
+                    className="flex items-center gap-3 py-3 px-4 min-h-[44px] hover:bg-white/10 transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    role="menuitem"
+                  >
+                    <span className="w-7 h-7 rounded-full bg-nnu-gold text-nnu-green flex items-center justify-center font-bold text-xs">
+                      {initial}
+                    </span>
+                    <span className="truncate">{user.displayName} · 个人中心</span>
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-3 py-3 px-4 min-h-[44px] hover:bg-white/10 transition-colors text-left"
+                    role="menuitem"
+                  >
+                    <LogOut className="w-5 h-5" />
+                    退出登录
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    className="flex items-center gap-3 py-3 px-4 min-h-[44px] hover:bg-white/10 transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    role="menuitem"
+                  >
+                    <LogIn className="w-5 h-5" />
+                    登录
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="flex items-center gap-3 py-3 px-4 min-h-[44px] hover:bg-white/10 transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    role="menuitem"
+                  >
+                    <UserPlus className="w-5 h-5" />
+                    注册
+                  </Link>
+                </>
+              )}
+            </div>
           </div>
         )}
       </nav>
