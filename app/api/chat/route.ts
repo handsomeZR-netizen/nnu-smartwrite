@@ -11,9 +11,9 @@ const ChatRequestSchema = z.object({
   messages: z.array(ChatMessageSchema).min(1).max(20),
   evaluationContext: z
     .object({
-      directions: z.string().max(500).optional(),
-      essayContext: z.string().max(2000).optional(),
-      studentSentence: z.string().max(1000).optional(),
+      directions: z.string().max(1000).optional(),
+      essayContext: z.string().max(8000).optional(),
+      studentSentence: z.string().max(8000).optional(),
       result: z
         .object({
           score: z.string().optional(),
