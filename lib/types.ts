@@ -53,6 +53,33 @@ export interface RadarDimensions {
 }
 
 /**
+ * 句子级 issue 类型枚举
+ */
+export type IssueType = 'grammar' | 'spelling' | 'vocab' | 'style' | 'logic';
+
+/**
+ * 句子内单条问题标注
+ *
+ * span 为相对于当前 sentence.text 的字符级半开区间 [start, end)
+ */
+export interface IssueSpan {
+  type: IssueType;             // 问题类型
+  span: [number, number];      // 在 sentence.text 里的字符 [start, end)
+  message: string;             // 中文一句话说明
+  suggestion?: string;         // 推荐改法
+}
+
+/**
+ * 单句批注（含 ≤3 条 issue + 整句点评）
+ */
+export interface SentenceAnnotation {
+  sentenceIndex: number;       // 切句后的下标
+  text: string;                // 原句（保留两端空白前后已 trim）
+  issues: IssueSpan[];         // ≤ 3 条
+  comment?: string;            // 整句点评（衔接逻辑 / 扣题）
+}
+
+/**
  * 评估结果数据结构（增强版）
  */
 export interface EvaluationResult {
@@ -70,6 +97,8 @@ export interface EvaluationResult {
   radarDimensions?: RadarDimensions;      // 可选：动态雷达图维度（新增）
   evaluationType?: EvaluationType;        // 评估类型
   reasoningProcess?: string;              // 推理过程（来自deepseek-reasoner）
+  numericScore?: number;                  // 可选：百分制总分 (0-100)，用于量化打分
+  sentenceAnnotations?: SentenceAnnotation[]; // 可选：逐句批注 + 错误标红信息
   timestamp: number;                      // 评估时间戳
 }
 
@@ -84,6 +113,30 @@ export const RadarScoresSchema = z.object({
 });
 
 /**
+ * 句子内 issue 验证 Schema
+ *
+ * span 必须是长度为 2 的 [start, end) 半开区间，且 start < end
+ */
+export const IssueSpanSchema = z.object({
+  type: z.enum(['grammar', 'spelling', 'vocab', 'style', 'logic']),
+  span: z
+    .tuple([z.number().int().nonnegative(), z.number().int().positive()])
+    .refine((s) => s[0] < s[1], { message: 'span 必须满足 start < end' }),
+  message: z.string().min(1),
+  suggestion: z.string().optional(),
+});
+
+/**
+ * 单句批注验证 Schema
+ */
+export const SentenceAnnotationSchema = z.object({
+  sentenceIndex: z.number().int().nonnegative(),
+  text: z.string(),
+  issues: z.array(IssueSpanSchema).max(3, '每句最多 3 条 issue'),
+  comment: z.string().optional(),
+});
+
+/**
  * 评估结果验证Schema
  */
 export const EvaluationResultSchema = z.object({
@@ -92,6 +145,8 @@ export const EvaluationResultSchema = z.object({
   analysis: z.string().min(1, '分析内容不能为空'),
   polishedVersion: z.string(),
   radarScores: RadarScoresSchema.optional(),
+  numericScore: z.number().min(0).max(100).optional(),
+  sentenceAnnotations: z.array(SentenceAnnotationSchema).optional(),
   timestamp: z.number(),
 });
 
