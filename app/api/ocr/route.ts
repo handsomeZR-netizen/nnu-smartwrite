@@ -52,11 +52,75 @@ interface MinerUBatchResultResponse {
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
+// MinerU returns a ZIP (full.md + content_list.json + layout.json + origin.pdf).
+// We unzip in-memory using Bun's built-in fflate-style API via global Response
+// + DecompressionStream where possible. To stay framework-agnostic, fall back
+// to a hand-rolled minimal ZIP central-directory parser that pulls just the
+// "full.md" entry.
+async function extractFullMdFromZip(zipBytes: ArrayBuffer): Promise<string | null> {
+  const buf = new Uint8Array(zipBytes);
+  // Find End Of Central Directory record (signature 0x06054b50)
+  const eocdSig = [0x50, 0x4b, 0x05, 0x06];
+  let eocdPos = -1;
+  for (let i = buf.length - 22; i >= Math.max(0, buf.length - 65557); i--) {
+    if (
+      buf[i] === eocdSig[0] &&
+      buf[i + 1] === eocdSig[1] &&
+      buf[i + 2] === eocdSig[2] &&
+      buf[i + 3] === eocdSig[3]
+    ) {
+      eocdPos = i;
+      break;
+    }
+  }
+  if (eocdPos < 0) return null;
+  const dv = new DataView(zipBytes);
+  const cdEntries = dv.getUint16(eocdPos + 10, true);
+  const cdOffset = dv.getUint32(eocdPos + 16, true);
+
+  let cursor = cdOffset;
+  for (let i = 0; i < cdEntries; i++) {
+    if (dv.getUint32(cursor, true) !== 0x02014b50) return null;
+    const compSize = dv.getUint32(cursor + 20, true);
+    const fnLen = dv.getUint16(cursor + 28, true);
+    const exLen = dv.getUint16(cursor + 30, true);
+    const cmLen = dv.getUint16(cursor + 32, true);
+    const localOffset = dv.getUint32(cursor + 42, true);
+    const fileName = new TextDecoder().decode(
+      buf.subarray(cursor + 46, cursor + 46 + fnLen),
+    );
+    cursor += 46 + fnLen + exLen + cmLen;
+
+    if (fileName.endsWith("full.md") || fileName === "full.md") {
+      // Read local file header
+      const lhFnLen = dv.getUint16(localOffset + 26, true);
+      const lhExLen = dv.getUint16(localOffset + 28, true);
+      const dataStart = localOffset + 30 + lhFnLen + lhExLen;
+      const compMethod = dv.getUint16(localOffset + 8, true);
+      const compressed = buf.subarray(dataStart, dataStart + compSize);
+      if (compMethod === 0) {
+        return new TextDecoder().decode(compressed);
+      }
+      if (compMethod === 8) {
+        // deflate — use DecompressionStream
+        const stream = new Response(
+          new Blob([compressed]).stream().pipeThrough(
+            new DecompressionStream("deflate-raw"),
+          ),
+        );
+        return await stream.text();
+      }
+      return null;
+    }
+  }
+  return null;
+}
+
 async function pollPreciseTask(
   batchId: string,
   token: string,
-  maxAttempts = 18,
-  intervalMs = 2500,
+  maxAttempts = 24,
+  intervalMs = 3000,
 ): Promise<{ markdown?: string; status: string; error?: string }> {
   for (let i = 0; i < maxAttempts; i++) {
     await sleep(intervalMs);
@@ -70,10 +134,21 @@ async function pollPreciseTask(
     if (result.state === "failed") {
       return { status: "failed", error: result.err_msg || "MinerU 解析失败" };
     }
-    if (result.state === "done" && result.markdown_url) {
+    if (result.state !== "done") continue;
+    // Prefer direct markdown_url if MinerU ever provides it
+    if (result.markdown_url) {
       const md = await fetch(result.markdown_url).then((res) => res.text());
       return { status: "done", markdown: md };
     }
+    // Fallback: download the ZIP and pull full.md out
+    if (result.full_zip_url) {
+      const zipResp = await fetch(result.full_zip_url);
+      if (!zipResp.ok) continue;
+      const md = await extractFullMdFromZip(await zipResp.arrayBuffer());
+      if (md) return { status: "done", markdown: md };
+      return { status: "failed", error: "无法从 MinerU 结果包中提取 markdown" };
+    }
+    return { status: "failed", error: "MinerU 返回完成但缺少结果地址" };
   }
   return { status: "running" };
 }

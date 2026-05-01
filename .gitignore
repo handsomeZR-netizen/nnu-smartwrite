@@ -47,3 +47,6 @@ next-env.d.ts
 
 # local screenshot scratch (chrome-devtools MCP captures)
 .screenshots/
+
+# OCR test fixtures (LaTeX-generated PDFs for manual smoke testing)
+test-fixtures/
