@@ -16,6 +16,7 @@ import {
   SignIn,
   SignOut,
   UserPlus,
+  GraduationCap,
 } from "@phosphor-icons/react";
 import { useAuth } from "@/lib/use-auth";
 import { logoutUser } from "@/lib/auth";
@@ -107,6 +108,19 @@ export const Navigation = React.forwardRef<HTMLElement, NavigationProps>(
             >
               <BookOpen className="w-4 h-4" />
               练习
+            </Link>
+            <Link
+              href="/njnu"
+              className="relative flex items-center gap-2 hover:bg-white/10 hover:text-nnu-gold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-nnu-gold rounded-lg px-4 py-2"
+              role="menuitem"
+              aria-label="南师专属（新功能）"
+            >
+              <GraduationCap className="w-4 h-4" />
+              南师专属
+              <span
+                className="w-1.5 h-1.5 rounded-full bg-nnu-jade shadow-[0_0_0_3px_rgba(93,176,144,0.35)] animate-pulse"
+                aria-hidden
+              />
             </Link>
             <Link
               href="/history"
@@ -233,6 +247,22 @@ export const Navigation = React.forwardRef<HTMLElement, NavigationProps>(
             >
               <BookOpen className="w-5 h-5" />
               练习
+            </Link>
+            <Link
+              href="/njnu"
+              className="flex items-center gap-3 py-3 px-4 min-h-[44px] hover:bg-white/10 transition-colors touch-manipulation focus:outline-none focus:ring-2 focus:ring-nnu-gold focus:ring-inset"
+              onClick={() => setIsMobileMenuOpen(false)}
+              role="menuitem"
+              aria-label="南师专属（新功能）"
+            >
+              <GraduationCap className="w-5 h-5" />
+              <span className="flex items-center gap-2">
+                南师专属
+                <span
+                  className="w-1.5 h-1.5 rounded-full bg-nnu-jade shadow-[0_0_0_3px_rgba(93,176,144,0.35)] animate-pulse"
+                  aria-hidden
+                />
+              </span>
             </Link>
             <Link
               href="/history"

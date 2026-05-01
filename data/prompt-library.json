@@ -219,7 +219,7 @@
             "故事段写一两个感官细节（夜里的随园灯、仙林的实验室）增强真实感",
             "结尾用 'Looking ahead, I will…' 给一个具体可量化的承诺"
           ],
-          "tags": ["njnu", "motto", "reflection"]
+          "tags": ["南师", "校训", "反思"]
         },
         {
           "id": "njnu-suiyuan-cultural-narrative",
@@ -234,7 +234,67 @@
             "把 'old trees' 升级为 'century-old plane trees whose canopies cast lacy shadows'",
             "结尾把建筑与学习并置：'where every footpath becomes a silent lecture.'"
           ],
-          "tags": ["njnu", "suiyuan", "narrative"]
+          "tags": ["南师", "随园", "叙事"]
+        },
+        {
+          "id": "njnu-teacher-trial-lesson-reflection",
+          "title": "师范英语试讲反思（200 词）",
+          "summary": "教育学院学生写一篇试讲后的英文反思，复盘课堂设计与学生反馈",
+          "evaluationFocus": ["切题", "师范素养", "结构", "表达", "文化意识"],
+          "scoreWeights": { "relevance": 25, "teaching_competence": 25, "structure": 20, "expression": 20, "cultural_awareness": 10 },
+          "directionsTemplate": "You have just delivered a 15-minute trial English lesson on \"My Hometown\" to a group of Grade 7 students. Write a 200-word reflective essay covering: (1) one teaching decision that worked (warm-up, scaffolding, group activity, etc.); (2) one moment that did not go as planned and what you learned; (3) a concrete adjustment you will make in your next 试讲, drawing on NJNU's 师范 tradition.",
+          "rubric": "亮点：能用教学法术语（scaffolding、wait time、formative feedback、student-centered）、围绕一个具体环节而非泛泛而谈、把 NJNU 师范传承（如『学高为师，身正为范』）自然嵌入、结尾有可执行的下一步。扣分点：通篇 'I think the lesson is good'、缺少课堂细节、把反思写成流水账、看不出师范生身份。",
+          "polishHints": [
+            "用 'In retrospect,' 或 'On reflection,' 引出反思而非简单的 'I think'",
+            "描述课堂用过去时 + 一句感官细节：'When I asked the warm-up question, three students lit up while the back row stayed silent.'",
+            "结尾给一个可量化调整：'Next time I will allocate 30 seconds of wait time before calling on volunteers.'"
+          ],
+          "tags": ["南师", "师范", "试讲", "反思"]
+        },
+        {
+          "id": "njnu-teaching-practicum-summary",
+          "title": "教育实习总结 reflective essay",
+          "summary": "在中学教育实习结束后，写一篇英文 reflective essay，回顾收获与成长",
+          "evaluationFocus": ["切题", "结构", "师范素养", "表达", "情感真挚"],
+          "scoreWeights": { "relevance": 20, "structure": 20, "teaching_competence": 25, "expression": 20, "authenticity": 15 },
+          "directionsTemplate": "Write a 220-word reflective essay summarizing your one-month teaching practicum at a partner middle school of NJNU. Address: (1) the most challenging classroom situation you faced and how you handled it; (2) one mentor or student who reshaped your understanding of being a teacher; (3) how this experience reaffirms or revises your career commitment to becoming a 人民教师.",
+          "rubric": "亮点：选一个具体情境（一个学生、一节课、一次家长沟通）展开、能引用师傅或学生的一句话、把『人民教师』『立德树人』等概念用英文解释而非生搬、结尾把校训精神落到具体职业承诺。扣分点：堆砌实习日程而无反思、对学生只有抽象描述、把『人民教师』直译为 'people teacher' 而不解释、结论空喊口号。",
+          "polishHints": [
+            "把抽象品质写成场景：'I learned patience the day a withdrawn boy first raised his hand.'",
+            "引用师傅原话用 reported speech：'My mentor once reminded me that …'",
+            "解释中文概念用同位语：'becoming a 人民教师 — a teacher who serves the public good — '"
+          ],
+          "tags": ["南师", "实习", "教育", "反思"]
+        },
+        {
+          "id": "njnu-international-exchange-statement",
+          "title": "国际处交流申请书 personal statement",
+          "summary": "申请南师大国际处的海外院校交换项目，写一份个人陈述",
+          "evaluationFocus": ["切题", "结构", "动机清晰", "表达", "文化意识"],
+          "scoreWeights": { "relevance": 20, "structure": 20, "motivation": 25, "expression": 25, "cultural_awareness": 10 },
+          "directionsTemplate": "Write a 280-word personal statement for the NJNU International Office, applying for a one-semester exchange at a partner university abroad. Cover: (1) why this exchange aligns with your academic trajectory at NJNU; (2) one concrete contribution you will bring as a student of 南京师范大学 (e.g., bridging Chinese pedagogy or culture); (3) what you plan to bring back to NJNU campus after returning.",
+          "rubric": "亮点：开篇有 hook 而非套话、动机围绕一个具体研究兴趣或课程（不是 'broaden horizon'）、能把 NJNU 师范底色作为差异化亮点、结尾承诺可落地的回流贡献（如 reading group / 工作坊）。扣分点：通篇 'broaden my horizon / global vision' 等空话、把交流写成旅游、回避『为什么是南师推荐我』。",
+          "polishHints": [
+            "开头用一个细节问题或场景：'The first time I taught …, I realized I needed …'",
+            "把动机锚定到目标院校的一门具体课程或一位教授",
+            "结尾用 'Upon returning to Suiyuan, I will …' 给出 1-2 个具体回流计划"
+          ],
+          "tags": ["南师", "国际交流", "申请书", "personal statement"]
+        },
+        {
+          "id": "njnu-history-narrative",
+          "title": "校史叙述 · 南师百年师范传承（180 词）",
+          "summary": "用英文向海外友校介绍南师大百年师范教育传承的简短叙述",
+          "evaluationFocus": ["切题", "文化意识", "结构", "表达", "词汇"],
+          "scoreWeights": { "relevance": 25, "cultural_awareness": 25, "structure": 20, "expression": 20, "vocabulary": 10 },
+          "directionsTemplate": "Write a 180-word narrative for an English-language brochure introducing NJNU's century-long heritage of teacher education to a partner university abroad. Anchor your narrative around: (1) the 1902 origins at Sanjiang Normal College and the lineage to today's NJNU; (2) one representative figure or moment (e.g., 陶行知's 'Life is Education' philosophy carried forward on this campus); (3) how the motto 正德厚生 · 笃学敏行 still shapes today's classrooms.",
+          "rubric": "亮点：年代、人物、地标至少各出现一次（1902 / Sanjiang Normal College / 陶行知 / 随园 / 仙林）、能用一句英文解释 'Life is Education'、能把校训与今天的课堂场景挂钩。扣分点：年代错乱、把陶行知译成 Tao Xingzhi 后没有任何说明、通篇形容词堆砌、和当代教育实践脱节。",
+          "polishHints": [
+            "首句用 'Tracing its roots to 1902,' 这种时空 anchor 开头",
+            "人物介绍用同位语：'Tao Xingzhi (1891-1946), a pioneering Chinese educator who championed Life is Education,'",
+            "把校训嵌入当代场景：'Today, that motto echoes in every Suiyuan lecture hall.'"
+          ],
+          "tags": ["南师", "校史", "叙述"]
         }
       ]
     }

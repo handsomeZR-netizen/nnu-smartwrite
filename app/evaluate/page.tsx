@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import dynamic from "next/dynamic";
+import { useSearchParams } from "next/navigation";
 import { EvaluationForm } from "@/components/nnu/evaluation-form";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,7 @@ import { Pulse, GraduationCap, Warning, ArrowCounterClockwise, ArrowLeft, Trash,
 import { FollowUpChat } from "@/components/nnu/followup-chat";
 import { ThinkingModeToggle } from "@/components/nnu/thinking-mode-toggle";
 import { PromptLibraryPanel, type PromptTemplate } from "@/components/nnu/prompt-library-panel";
+import promptLibraryData from "@/data/prompt-library.json";
 
 const ResultCard = dynamic(
   () => import("@/components/nnu/result-card").then(mod => mod.ResultCard),
@@ -20,7 +22,8 @@ const ResultCard = dynamic(
 
 const CURRENT_EVALUATION_KEY = 'nnu-current-evaluation';
 
-export default function EvaluatePage() {
+function EvaluatePageInner() {
+  const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = React.useState(false);
   const [result, setResult] = React.useState<EvaluationResult | null>(null);
   const [error, setError] = React.useState<APIError | null>(null);
@@ -29,10 +32,32 @@ export default function EvaluatePage() {
   const [appliedTemplate, setAppliedTemplate] = React.useState<PromptTemplate | null>(null);
   const showResult = !!result;
 
-  const handleApplyTemplate = (t: PromptTemplate) => {
+  const handleApplyTemplate = React.useCallback((t: PromptTemplate) => {
     setSeedFromTemplate({ directions: t.directionsTemplate });
     setAppliedTemplate(t);
-  };
+  }, []);
+
+  const didApplyFromUrlRef = React.useRef(false);
+  React.useEffect(() => {
+    if (didApplyFromUrlRef.current) return;
+    const templateId = searchParams?.get("template");
+    if (!templateId) {
+      didApplyFromUrlRef.current = true;
+      return;
+    }
+    const lib = promptLibraryData as unknown as {
+      categories: Array<{ templates: PromptTemplate[] }>;
+    };
+    for (const cat of lib.categories) {
+      const found = cat.templates.find((t) => t.id === templateId);
+      if (found) {
+        handleApplyTemplate(found);
+        break;
+      }
+    }
+    didApplyFromUrlRef.current = true;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // 页面加载时恢复上次的评测结果
   React.useEffect(() => {
@@ -292,5 +317,21 @@ export default function EvaluatePage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function EvaluatePage() {
+  return (
+    <React.Suspense
+      fallback={
+        <div className="min-h-screen bg-nnu-paper pt-24 pb-8 px-4">
+          <div className="container mx-auto max-w-7xl">
+            <ResultCardSkeleton />
+          </div>
+        </div>
+      }
+    >
+      <EvaluatePageInner />
+    </React.Suspense>
   );
 }
