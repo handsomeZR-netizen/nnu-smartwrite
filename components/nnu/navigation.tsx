@@ -6,17 +6,17 @@ import { useRouter } from "next/navigation";
 import { Logo } from "./logo";
 import { cn } from "@/lib/utils";
 import {
-  Menu,
+  List,
   X,
-  History,
+  ClockCounterClockwise,
   BookOpen,
-  Home,
-  Settings,
+  House,
+  GearSix,
   User,
-  LogIn,
-  LogOut,
+  SignIn,
+  SignOut,
   UserPlus,
-} from "lucide-react";
+} from "@phosphor-icons/react";
 import { useAuth } from "@/lib/use-auth";
 import { logoutUser } from "@/lib/auth";
 
@@ -97,7 +97,7 @@ export const Navigation = React.forwardRef<HTMLElement, NavigationProps>(
               className="flex items-center gap-2 hover:bg-white/10 hover:text-nnu-gold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-nnu-gold rounded-lg px-4 py-2"
               role="menuitem"
             >
-              <Home className="w-4 h-4" />
+              <House className="w-4 h-4" />
               首页
             </Link>
             <Link
@@ -113,7 +113,7 @@ export const Navigation = React.forwardRef<HTMLElement, NavigationProps>(
               className="flex items-center gap-2 hover:bg-white/10 hover:text-nnu-gold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-nnu-gold rounded-lg px-4 py-2"
               role="menuitem"
             >
-              <History className="w-4 h-4" />
+              <ClockCounterClockwise className="w-4 h-4" />
               历史
             </Link>
             <Link
@@ -122,7 +122,7 @@ export const Navigation = React.forwardRef<HTMLElement, NavigationProps>(
               role="menuitem"
               aria-label="系统设置"
             >
-              <Settings className="w-4 h-4" />
+              <GearSix className="w-4 h-4" />
               设置
             </Link>
 
@@ -164,7 +164,7 @@ export const Navigation = React.forwardRef<HTMLElement, NavigationProps>(
                         className="w-full flex items-center gap-2 px-4 py-2 text-sm hover:bg-nnu-paper text-left"
                         role="menuitem"
                       >
-                        <LogOut className="w-4 h-4" />
+                        <SignOut className="w-4 h-4" />
                         退出登录
                       </button>
                     </div>
@@ -176,7 +176,7 @@ export const Navigation = React.forwardRef<HTMLElement, NavigationProps>(
                     href="/login"
                     className="flex items-center gap-1.5 hover:bg-white/10 hover:text-nnu-gold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-nnu-gold rounded-lg px-3 py-2 text-sm"
                   >
-                    <LogIn className="w-4 h-4" />
+                    <SignIn className="w-4 h-4" />
                     登录
                   </Link>
                   <Link
@@ -203,7 +203,7 @@ export const Navigation = React.forwardRef<HTMLElement, NavigationProps>(
             {isMobileMenuOpen ? (
               <X className="w-6 h-6" />
             ) : (
-              <Menu className="w-6 h-6" />
+              <List className="w-6 h-6" />
             )}
           </button>
         </div>
@@ -222,7 +222,7 @@ export const Navigation = React.forwardRef<HTMLElement, NavigationProps>(
               onClick={() => setIsMobileMenuOpen(false)}
               role="menuitem"
             >
-              <Home className="w-5 h-5" />
+              <House className="w-5 h-5" />
               首页
             </Link>
             <Link
@@ -240,7 +240,7 @@ export const Navigation = React.forwardRef<HTMLElement, NavigationProps>(
               onClick={() => setIsMobileMenuOpen(false)}
               role="menuitem"
             >
-              <History className="w-5 h-5" />
+              <ClockCounterClockwise className="w-5 h-5" />
               历史
             </Link>
             <Link
@@ -249,7 +249,7 @@ export const Navigation = React.forwardRef<HTMLElement, NavigationProps>(
               onClick={() => setIsMobileMenuOpen(false)}
               role="menuitem"
             >
-              <Settings className="w-5 h-5" />
+              <GearSix className="w-5 h-5" />
               设置
             </Link>
 
@@ -273,7 +273,7 @@ export const Navigation = React.forwardRef<HTMLElement, NavigationProps>(
                     className="w-full flex items-center gap-3 py-3 px-4 min-h-[44px] hover:bg-white/10 transition-colors text-left"
                     role="menuitem"
                   >
-                    <LogOut className="w-5 h-5" />
+                    <SignOut className="w-5 h-5" />
                     退出登录
                   </button>
                 </>
@@ -285,7 +285,7 @@ export const Navigation = React.forwardRef<HTMLElement, NavigationProps>(
                     onClick={() => setIsMobileMenuOpen(false)}
                     role="menuitem"
                   >
-                    <LogIn className="w-5 h-5" />
+                    <SignIn className="w-5 h-5" />
                     登录
                   </Link>
                   <Link

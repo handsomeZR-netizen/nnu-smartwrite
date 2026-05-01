@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { getSettings, saveSettings, resetSettings, type AppSettings } from "@/lib/settings";
-import { Settings, Cloud, Key, RefreshCw, Save, RotateCcw, CheckCircle, AlertCircle, Brain } from "lucide-react";
+import { GearSix, Cloud, Key, ArrowsClockwise, FloppyDisk, ArrowCounterClockwise, CheckCircle, WarningCircle, Brain } from "@phosphor-icons/react";
 import { ThinkingModeToggle } from "@/components/nnu/thinking-mode-toggle";
 
 export default function SettingsPage() {
@@ -86,7 +86,7 @@ export default function SettingsPage() {
       <div className="min-h-screen bg-nnu-paper pt-24 pb-8 px-4">
         <div className="container mx-auto max-w-4xl">
           <div className="text-center py-16">
-            <RefreshCw className="w-12 h-12 text-nnu-green animate-spin mx-auto mb-4" />
+            <ArrowsClockwise className="w-12 h-12 text-nnu-green animate-spin mx-auto mb-4" />
             <p className="text-gray-600">加载设置中...</p>
           </div>
         </div>
@@ -100,7 +100,7 @@ export default function SettingsPage() {
         {/* 页面标题 */}
         <header className="mb-8">
           <div className="flex items-center gap-3 mb-2">
-            <Settings className="w-8 h-8 text-nnu-green" />
+            <GearSix className="w-8 h-8 text-nnu-green" />
             <h1 className="text-3xl md:text-4xl font-bold text-nnu-green">系统设置</h1>
           </div>
           <p className="text-gray-600">配置API和个性化选项</p>
@@ -119,7 +119,7 @@ export default function SettingsPage() {
             {saveMessage.type === 'success' ? (
               <CheckCircle className="w-5 h-5" />
             ) : (
-              <AlertCircle className="w-5 h-5" />
+              <WarningCircle className="w-5 h-5" />
             )}
             <span>{saveMessage.text}</span>
           </div>
@@ -285,7 +285,7 @@ export default function SettingsPage() {
             variant="outline"
             className="text-gray-600 hover:text-gray-900"
           >
-            <RotateCcw className="w-4 h-4 mr-2" />
+            <ArrowCounterClockwise className="w-4 h-4 mr-2" />
             重置设置
           </Button>
           <Button
@@ -295,12 +295,12 @@ export default function SettingsPage() {
           >
             {isSaving ? (
               <>
-                <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                <ArrowsClockwise className="w-4 h-4 mr-2 animate-spin" />
                 保存中...
               </>
             ) : (
               <>
-                <Save className="w-4 h-4 mr-2" />
+                <FloppyDisk className="w-4 h-4 mr-2" />
                 保存设置
               </>
             )}

@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import type { EvaluationInput, EvaluationResult, APIError } from "@/lib/types";
 import { saveToHistory } from "@/lib/storage";
 import { ResultCardSkeleton } from "@/components/nnu/skeletons";
-import { Activity, GraduationCap, AlertTriangle, RotateCcw, ArrowLeft, Trash2, Printer } from "lucide-react";
+import { Pulse, GraduationCap, Warning, ArrowCounterClockwise, ArrowLeft, Trash, Printer } from "@phosphor-icons/react";
 import { FollowUpChat } from "@/components/nnu/followup-chat";
 import { ThinkingModeToggle } from "@/components/nnu/thinking-mode-toggle";
 
@@ -190,7 +190,7 @@ export default function EvaluatePage() {
             {!showResult && !isLoading && !error && (
               <div className="h-full min-h-[400px] flex flex-col items-center justify-center bg-white rounded-xl shadow-sm border border-gray-100 text-gray-400 p-8 text-center">
                 <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                  <Activity className="w-10 h-10 text-gray-300" />
+                  <Pulse className="w-10 h-10 text-gray-300" />
                 </div>
                 <p className="font-medium">等待提交评测...</p>
                 <p className="text-sm mt-2">点击左侧"一键填入测试用例"快速体验</p>
@@ -218,7 +218,7 @@ export default function EvaluatePage() {
                 <CardContent className="pt-6">
                   <div className="text-center space-y-4">
                     <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto">
-                      <AlertTriangle className="w-8 h-8 text-red-500" />
+                      <Warning className="w-8 h-8 text-red-500" />
                     </div>
                     <h3 className="text-xl font-semibold text-red-600">
                       {error.error === 'INVALID_INPUT' ? '输入错误' : '评估失败'}
@@ -227,7 +227,7 @@ export default function EvaluatePage() {
                     <div className="flex gap-4 justify-center">
                       {error.retryable && (
                         <Button onClick={handleRetry} variant="nnu" disabled={isLoading}>
-                          <RotateCcw className="w-4 h-4 mr-2" />
+                          <ArrowCounterClockwise className="w-4 h-4 mr-2" />
                           {isLoading ? '重试中...' : '重试'}
                         </Button>
                       )}
@@ -265,7 +265,7 @@ export default function EvaluatePage() {
                     variant="outline"
                     className="text-gray-600 hover:text-red-600 hover:border-red-300"
                   >
-                    <Trash2 className="w-4 h-4 mr-2" />
+                    <Trash className="w-4 h-4 mr-2" />
                     清空当前评测
                   </Button>
                 </div>

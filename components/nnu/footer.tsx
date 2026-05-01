@@ -1,7 +1,9 @@
+"use client";
+
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import { Logo } from "./logo";
-import { ExternalLink, HelpCircle, Info, Mail, Github } from "lucide-react";
+import { ArrowSquareOut, Question, Info, EnvelopeSimple, GithubLogo } from "@phosphor-icons/react";
 
 export interface FooterProps extends React.HTMLAttributes<HTMLElement> {}
 
@@ -47,7 +49,7 @@ export const Footer = React.forwardRef<HTMLElement, FooterProps>(
               rel="noopener noreferrer"
               className="flex items-center gap-2 hover:text-nnu-gold transition-all duration-200 py-2 px-3 min-h-[44px] touch-manipulation rounded-lg hover:bg-white/10"
             >
-              <ExternalLink className="w-4 h-4" />
+              <ArrowSquareOut className="w-4 h-4" weight="regular" />
               学校官网
             </a>
             <a
@@ -61,7 +63,7 @@ export const Footer = React.forwardRef<HTMLElement, FooterProps>(
               href="#"
               className="flex items-center gap-2 hover:text-nnu-gold transition-all duration-200 py-2 px-3 min-h-[44px] touch-manipulation rounded-lg hover:bg-white/10"
             >
-              <HelpCircle className="w-4 h-4" />
+              <Question className="w-4 h-4" weight="regular" />
               帮助中心
             </a>
           </div>
@@ -73,7 +75,7 @@ export const Footer = React.forwardRef<HTMLElement, FooterProps>(
               className="footer-social-link group"
               aria-label="发送邮件"
             >
-              <Mail className="w-5 h-5 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12" />
+              <EnvelopeSimple className="w-5 h-5 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12" weight="regular" />
             </a>
             <a
               href="https://github.com/handsomeZR-netizen/nnu-smartwrite"
@@ -82,7 +84,7 @@ export const Footer = React.forwardRef<HTMLElement, FooterProps>(
               className="footer-social-link group"
               aria-label="访问 GitHub 仓库"
             >
-              <Github className="w-5 h-5 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12" />
+              <GithubLogo className="w-5 h-5 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12" weight="regular" />
             </a>
           </div>
 

@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { GraduationCap, AlertTriangle } from "lucide-react";
+import { GraduationCap, Warning } from "@phosphor-icons/react";
 import { registerUser, RegisterInputSchema } from "@/lib/auth";
 import { useAuth } from "@/lib/use-auth";
 
@@ -67,7 +67,7 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen bg-nnu-paper pt-24 pb-12 px-4 flex items-center justify-center">
-      <Card className="w-full max-w-md bg-white shadow-xl border-t-4 border-nnu-green">
+      <Card className="w-full max-w-md liquid-glass border-t-4 border-nnu-green rounded-2xl">
         <CardContent className="p-8">
           <div className="flex flex-col items-center text-center mb-6">
             <div className="w-14 h-14 rounded-full bg-nnu-green/10 flex items-center justify-center mb-3">
@@ -154,7 +154,7 @@ export default function RegisterPage() {
 
             {submitError && (
               <div className="flex items-start gap-2 bg-red-50 border border-red-200 rounded-md p-3 text-sm text-red-700">
-                <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                <Warning className="w-4 h-4 mt-0.5 flex-shrink-0" />
                 <span>{submitError}</span>
               </div>
             )}

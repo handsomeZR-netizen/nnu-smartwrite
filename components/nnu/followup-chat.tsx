@@ -4,7 +4,7 @@ import * as React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { MessageCircle, Send, Sparkles, AlertTriangle } from "lucide-react";
+import { ChatCircle, PaperPlaneRight, Sparkle, Warning } from "@phosphor-icons/react";
 import type { EvaluationInput, EvaluationResult } from "@/lib/types";
 
 interface ChatMessage {
@@ -99,10 +99,10 @@ export const FollowUpChat: React.FC<FollowUpChatProps> = ({ input, result }) => 
   };
 
   return (
-    <Card className="bg-white shadow-md border border-nnu-green/15 print:hidden">
+    <Card className="liquid-glass-tinted border-0 print:hidden">
       <CardContent className="p-5 sm:p-6">
         <div className="flex items-center gap-2 mb-3">
-          <MessageCircle className="w-5 h-5 text-nnu-green" />
+          <ChatCircle className="w-5 h-5 text-nnu-green" />
           <h3 className="font-bold text-nnu-green">继续追问 AI</h3>
         </div>
         <p className="text-xs text-gray-500 mb-4">
@@ -119,7 +119,7 @@ export const FollowUpChat: React.FC<FollowUpChatProps> = ({ input, result }) => 
                 disabled={isSending}
                 className="text-left text-sm bg-nnu-paper border border-nnu-green/20 rounded-lg px-3 py-2 hover:bg-nnu-green/5 transition-colors disabled:opacity-60"
               >
-                <Sparkles className="inline w-3.5 h-3.5 mr-1.5 text-nnu-coral" />
+                <Sparkle className="inline w-3.5 h-3.5 mr-1.5 text-nnu-coral" />
                 {q}
               </button>
             ))}
@@ -155,7 +155,7 @@ export const FollowUpChat: React.FC<FollowUpChatProps> = ({ input, result }) => 
 
         {error && (
           <div className="flex items-start gap-2 bg-red-50 border border-red-200 rounded-md p-3 text-sm text-red-700 mb-3">
-            <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+            <Warning className="w-4 h-4 mt-0.5 flex-shrink-0" />
             <span>{error}</span>
           </div>
         )}
@@ -182,7 +182,7 @@ export const FollowUpChat: React.FC<FollowUpChatProps> = ({ input, result }) => 
             disabled={isSending || !draft.trim()}
             aria-label="发送"
           >
-            <Send className="w-4 h-4" />
+            <PaperPlaneRight className="w-4 h-4" />
           </Button>
         </form>
         <p className="text-xs text-gray-400 mt-2">Enter 发送，Shift+Enter 换行</p>

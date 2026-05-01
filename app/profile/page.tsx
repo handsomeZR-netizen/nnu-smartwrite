@@ -16,13 +16,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  Activity,
-  TrendingUp,
+  Pulse,
+  TrendUp,
   Target,
   BookOpen,
-  Sparkles,
-  AlertTriangle,
-} from "lucide-react";
+  Sparkle,
+  Warning,
+} from "@phosphor-icons/react";
 import { useAuth } from "@/lib/use-auth";
 import { getHistory } from "@/lib/storage";
 import {
@@ -76,7 +76,7 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-nnu-paper pt-24 pb-12 px-4">
       <div className="container mx-auto max-w-5xl">
         {/* Header */}
-        <Card className="bg-gradient-to-r from-nnu-green to-nnu-green/85 text-white shadow-xl border-none mb-6">
+        <Card className="liquid-glass-dark text-white border-none mb-6 rounded-2xl">
           <CardContent className="p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center gap-5">
             <div className="w-20 h-20 rounded-full bg-nnu-gold text-nnu-green flex items-center justify-center text-3xl font-bold flex-shrink-0">
               {user.displayName[0]?.toUpperCase()}
@@ -103,13 +103,13 @@ export default function ProfilePage() {
 
         {/* Tabs */}
         <div className="flex flex-wrap gap-2 mb-4" role="tablist">
-          <TabButton active={tab === "growth"} onClick={() => setTab("growth")} icon={<TrendingUp className="w-4 h-4" />}>
+          <TabButton active={tab === "growth"} onClick={() => setTab("growth")} icon={<TrendUp className="w-4 h-4" />}>
             成长曲线
           </TabButton>
           <TabButton active={tab === "weak"} onClick={() => setTab("weak")} icon={<Target className="w-4 h-4" />}>
             薄弱点分析
           </TabButton>
-          <TabButton active={tab === "recommend"} onClick={() => setTab("recommend")} icon={<Sparkles className="w-4 h-4" />}>
+          <TabButton active={tab === "recommend"} onClick={() => setTab("recommend")} icon={<Sparkle className="w-4 h-4" />}>
             针对性练习
           </TabButton>
         </div>
@@ -163,7 +163,7 @@ const GrowthTab: React.FC<{ growth: GrowthPoint[] }> = ({ growth }) => {
   if (growth.length === 0) {
     return (
       <EmptyState
-        icon={<Activity className="w-10 h-10 text-gray-300" />}
+        icon={<Pulse className="w-10 h-10 text-gray-300" />}
         title="还没有评测数据"
         body="提交一次评测后，这里会画出你的写作成长曲线。"
         action={
@@ -256,7 +256,7 @@ const RecommendTab: React.FC<{
   if (!hasRecords) {
     return (
       <EmptyState
-        icon={<Sparkles className="w-10 h-10 text-gray-300" />}
+        icon={<Sparkle className="w-10 h-10 text-gray-300" />}
         title="先做一次评测吧"
         body="完成评测后，系统会基于你的薄弱维度推荐对应难度与方向的练习题。"
         action={
@@ -288,7 +288,7 @@ const RecommendTab: React.FC<{
       </p>
       {questions.length === 0 ? (
         <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start gap-3 text-sm text-amber-800">
-          <AlertTriangle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+          <Warning className="w-5 h-5 flex-shrink-0 mt-0.5" />
           <span>暂未匹配到对应练习，可去练习大厅自由选择题目。</span>
         </div>
       ) : (
