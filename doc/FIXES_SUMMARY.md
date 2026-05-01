@@ -83,7 +83,7 @@ Module not found: Can't resolve 'react-is'
 **解决方案**：
 降级 `react-is` 到兼容版本：
 ```bash
-npm install react-is@18.3.1 --save-exact
+bun add react-is@18.3.1 --exact
 ```
 
 **结果**：✅ Netlify 构建成功
@@ -111,7 +111,7 @@ const endpoint = baseEndpoint.includes('/chat/completions')
 
 ### 本地构建
 ```bash
-npm run build
+bun run build
 ```
 ✅ 成功，无警告
 

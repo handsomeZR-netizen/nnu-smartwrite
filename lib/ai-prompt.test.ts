@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from 'bun:test';
 import { EVALUATION_SYSTEM_PROMPT, createEvaluationPrompt, createEvaluationPromptWithRadar } from './ai-prompt';
 import type { EvaluationInput } from './types';
 

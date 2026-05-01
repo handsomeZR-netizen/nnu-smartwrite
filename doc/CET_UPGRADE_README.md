@@ -94,7 +94,7 @@ node test-cet-evaluation.js
 ### 1. 启动开发服务器
 ```bash
 cd nnu-smartwrite
-npm run dev
+bun dev
 ```
 
 ### 2. 访问评估页面

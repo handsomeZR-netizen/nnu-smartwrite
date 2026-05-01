@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, mock, beforeEach } from 'bun:test';
 import { POST } from './route';
 import { NextRequest } from 'next/server';
 import * as fc from 'fast-check';
@@ -57,7 +57,7 @@ describe('API Route - Property-Based Tests', () => {
         validAIResponseArb,
         async (input, aiResponse) => {
           // Mock fetch to return our generated AI response
-          global.fetch = vi.fn().mockResolvedValue({
+          global.fetch = mock(async () => ({
             ok: true,
             json: async () => ({
               choices: [
@@ -69,7 +69,7 @@ describe('API Route - Property-Based Tests', () => {
                 },
               ],
             }),
-          });
+          })) as unknown as typeof fetch;
 
           // Create mock request
           const request = new NextRequest('http://localhost:3000/api/evaluate', {
@@ -127,7 +127,7 @@ describe('API Route - Unit Tests', () => {
       polished_version: 'Your sentence is excellent.',
     };
 
-    global.fetch = vi.fn().mockResolvedValue({
+    global.fetch = mock(async () => ({
       ok: true,
       json: async () => ({
         choices: [
@@ -139,7 +139,7 @@ describe('API Route - Unit Tests', () => {
           },
         ],
       }),
-    });
+    })) as unknown as typeof fetch;
 
     const validInput = {
       directions: 'Translate the sentence',
@@ -243,11 +243,11 @@ describe('API Route - Unit Tests', () => {
   });
 
   it('should handle DeepSeek API errors gracefully', async () => {
-    global.fetch = vi.fn().mockResolvedValue({
+    global.fetch = mock(async () => ({
       ok: false,
       status: 503,
       text: async () => 'Service Unavailable',
-    });
+    })) as unknown as typeof fetch;
 
     const validInput = {
       directions: 'Translate the sentence',
@@ -269,7 +269,7 @@ describe('API Route - Unit Tests', () => {
   });
 
   it('should handle malformed AI response', async () => {
-    global.fetch = vi.fn().mockResolvedValue({
+    global.fetch = mock(async () => ({
       ok: true,
       json: async () => ({
         choices: [
@@ -281,7 +281,7 @@ describe('API Route - Unit Tests', () => {
           },
         ],
       }),
-    });
+    })) as unknown as typeof fetch;
 
     const validInput = {
       directions: 'Translate the sentence',

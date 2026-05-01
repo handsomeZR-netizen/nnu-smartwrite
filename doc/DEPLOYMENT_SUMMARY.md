@@ -5,7 +5,7 @@
 ### 1. Netlify 配置文件 (`netlify.toml`)
 
 ✅ **构建设置**
-- 构建命令: `npm run build`
+- 构建命令: `bun install --frozen-lockfile && bun run build`
 - 发布目录: `.next`
 - Node 版本: 20
 - 函数打包器: esbuild
@@ -102,7 +102,7 @@
 ## 构建验证
 
 ✅ **本地构建测试**
-- 运行 `npm run build` 成功
+- 运行 `bun run build` 成功
 - 无 TypeScript 错误
 - 无 ESLint 警告
 - 所有页面正确生成

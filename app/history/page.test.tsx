@@ -1,31 +1,36 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, mock, jest } from 'bun:test';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import * as fc from 'fast-check';
+import type { Mock } from 'bun:test';
+
+// Mock storage module — bun:test hoists top-level mock.module calls
+const storageMocks = {
+  getHistory: mock(),
+  clearHistory: mock(),
+  deleteHistoryRecord: mock(),
+};
+mock.module('@/lib/storage', () => storageMocks);
+
 import HistoryPage from './page';
 import * as storage from '@/lib/storage';
 import type { HistoryRecord, EvaluationInput, EvaluationResult } from '@/lib/types';
 
-// Mock storage module
-vi.mock('@/lib/storage', () => ({
-  getHistory: vi.fn(),
-  clearHistory: vi.fn(),
-  deleteHistoryRecord: vi.fn(),
-}));
-
 // Mock window.confirm and window.alert
-const mockConfirm = vi.fn();
-const mockAlert = vi.fn();
-global.confirm = mockConfirm;
-global.alert = mockAlert;
+const mockConfirm = mock();
+const mockAlert = mock();
+global.confirm = mockConfirm as unknown as typeof confirm;
+global.alert = mockAlert as unknown as typeof alert;
 
 // Mock window.location
 delete (window as any).location;
 window.location = { href: '' } as any;
 
+const asMock = <T,>(fn: T) => fn as unknown as Mock<(...args: never[]) => unknown>;
+
 describe('HistoryPage', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    jest.clearAllMocks();
     mockConfirm.mockReturnValue(false);
   });
 
@@ -59,7 +64,7 @@ describe('HistoryPage', () => {
             ),
             async (records) => {
               // Mock getHistory to return the generated records
-              vi.mocked(storage.getHistory).mockReturnValue({
+              asMock(storage.getHistory).mockReturnValue({
                 records: records as HistoryRecord[],
                 version: '1.0',
               });
@@ -102,7 +107,7 @@ describe('HistoryPage', () => {
 
   // Unit test: Empty state
   it('should display empty state when no records exist', async () => {
-    vi.mocked(storage.getHistory).mockReturnValue({
+    asMock(storage.getHistory).mockReturnValue({
       records: [],
       version: '1.0',
     });
@@ -137,11 +142,11 @@ describe('HistoryPage', () => {
       },
     ];
 
-    vi.mocked(storage.getHistory).mockReturnValue({
+    asMock(storage.getHistory).mockReturnValue({
       records: mockRecords,
       version: '1.0',
     });
-    vi.mocked(storage.clearHistory).mockReturnValue(true);
+    asMock(storage.clearHistory).mockReturnValue(true);
     mockConfirm.mockReturnValue(true);
 
     render(<HistoryPage />);
@@ -180,11 +185,11 @@ describe('HistoryPage', () => {
       },
     ];
 
-    vi.mocked(storage.getHistory).mockReturnValue({
+    asMock(storage.getHistory).mockReturnValue({
       records: mockRecords,
       version: '1.0',
     });
-    vi.mocked(storage.deleteHistoryRecord).mockReturnValue(true);
+    asMock(storage.deleteHistoryRecord).mockReturnValue(true);
     mockConfirm.mockReturnValue(true);
 
     render(<HistoryPage />);
@@ -222,7 +227,7 @@ describe('HistoryPage', () => {
       },
     ];
 
-    vi.mocked(storage.getHistory).mockReturnValue({
+    asMock(storage.getHistory).mockReturnValue({
       records: mockRecords,
       version: '1.0',
     });
@@ -271,7 +276,7 @@ describe('HistoryPage', () => {
               const user = userEvent.setup();
 
               // Mock getHistory to return the generated record
-              vi.mocked(storage.getHistory).mockReturnValue({
+              asMock(storage.getHistory).mockReturnValue({
                 records: [record as HistoryRecord],
                 version: '1.0',
               });

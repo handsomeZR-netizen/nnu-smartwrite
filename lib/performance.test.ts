@@ -2,55 +2,56 @@
  * Unit tests for performance utilities
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, mock, beforeEach, afterEach, jest } from 'bun:test';
 import { debounce, throttle, getCachedData, setCachedData, clearCachedData } from './performance';
 
 describe('Performance Utilities', () => {
   beforeEach(() => {
     // Clear localStorage before each test
     localStorage.clear();
-    vi.useFakeTimers();
+    jest.useFakeTimers();
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    jest.restoreAllMocks();
+    jest.useRealTimers();
   });
 
   describe('debounce', () => {
     it('should delay function execution', () => {
-      const fn = vi.fn();
+      const fn = mock();
       const debouncedFn = debounce(fn, 1000);
 
       debouncedFn();
       expect(fn).not.toHaveBeenCalled();
 
-      vi.advanceTimersByTime(999);
+      jest.advanceTimersByTime(999);
       expect(fn).not.toHaveBeenCalled();
 
-      vi.advanceTimersByTime(1);
+      jest.advanceTimersByTime(1);
       expect(fn).toHaveBeenCalledTimes(1);
     });
 
     it('should reset timer on subsequent calls', () => {
-      const fn = vi.fn();
+      const fn = mock();
       const debouncedFn = debounce(fn, 1000);
 
       debouncedFn();
-      vi.advanceTimersByTime(500);
+      jest.advanceTimersByTime(500);
       debouncedFn();
-      vi.advanceTimersByTime(500);
+      jest.advanceTimersByTime(500);
       expect(fn).not.toHaveBeenCalled();
 
-      vi.advanceTimersByTime(500);
+      jest.advanceTimersByTime(500);
       expect(fn).toHaveBeenCalledTimes(1);
     });
 
     it('should pass arguments correctly', () => {
-      const fn = vi.fn();
+      const fn = mock();
       const debouncedFn = debounce(fn, 1000);
 
       debouncedFn('test', 123);
-      vi.advanceTimersByTime(1000);
+      jest.advanceTimersByTime(1000);
 
       expect(fn).toHaveBeenCalledWith('test', 123);
     });
@@ -58,7 +59,7 @@ describe('Performance Utilities', () => {
 
   describe('throttle', () => {
     it('should execute function immediately on first call', () => {
-      const fn = vi.fn();
+      const fn = mock();
       const throttledFn = throttle(fn, 1000);
 
       throttledFn();
@@ -66,7 +67,7 @@ describe('Performance Utilities', () => {
     });
 
     it('should ignore calls within throttle period', () => {
-      const fn = vi.fn();
+      const fn = mock();
       const throttledFn = throttle(fn, 1000);
 
       throttledFn();
@@ -76,19 +77,19 @@ describe('Performance Utilities', () => {
     });
 
     it('should allow calls after throttle period', () => {
-      const fn = vi.fn();
+      const fn = mock();
       const throttledFn = throttle(fn, 1000);
 
       throttledFn();
       expect(fn).toHaveBeenCalledTimes(1);
 
-      vi.advanceTimersByTime(1000);
+      jest.advanceTimersByTime(1000);
       throttledFn();
       expect(fn).toHaveBeenCalledTimes(2);
     });
 
     it('should pass arguments correctly', () => {
-      const fn = vi.fn();
+      const fn = mock();
       const throttledFn = throttle(fn, 1000);
 
       throttledFn('test', 456);

@@ -101,7 +101,7 @@ nnu-smartwrite/
 ✅ 构建成功，无错误
 
 ## 下一步建议
-1. 运行 `npm run dev` 启动开发服务器
+1. 运行 `bun dev` 启动开发服务器
 2. 访问 `http://localhost:3000/settings` 测试设置页面
 3. 测试示例切换功能
 4. 测试自定义 API 配置

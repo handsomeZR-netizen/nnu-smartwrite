@@ -180,7 +180,7 @@ className="grid grid-cols-1 md:grid-cols-3"
 
 运行可访问性测试：
 ```bash
-npm run test -- lib/accessibility.test.ts
+bun test lib/accessibility.test.ts
 ```
 
 ### 手动测试清单

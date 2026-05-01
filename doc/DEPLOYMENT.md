@@ -33,7 +33,7 @@ git push origin main
 Netlify 会自动检测 `netlify.toml` 配置文件，但请确认以下设置：
 
 - **Base directory**: `nnu-smartwrite`
-- **Build command**: `npm run build`
+- **Build command**: `bun install --frozen-lockfile && bun run build`
 - **Publish directory**: `.next`
 - **Node version**: 20
 
@@ -194,12 +194,12 @@ CSP 配置允许以下来源：
 
 #### 1. 构建失败
 
-**错误**：`npm install` 失败
+**错误**：`bun install` 失败
 
 **解决**：
 - 检查 `package.json` 依赖版本
-- 确认 Node 版本为 20
-- 尝试添加 `NPM_FLAGS = "--legacy-peer-deps"`
+- 确认 `BUN_VERSION` 与本地一致（推荐 1.3.13），且 `NODE_VERSION = "20"` 仍保留供 Netlify Next.js 运行时使用
+- 删除 `bun.lock` 重新生成后再提交
 
 #### 2. API 调用失败
 

@@ -107,13 +107,13 @@
 
 ### 本地开发
 ```bash
-npm run dev
+bun dev
 ```
 
 ### 生产构建
 ```bash
-npm run build
-npm start
+bun run build
+bun start
 ```
 
 ### 环境变量

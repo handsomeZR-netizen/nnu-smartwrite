@@ -1,7 +1,7 @@
 # Netlify Configuration for NNU-SmartWrite
 
 [build]
-  command = "npm run build"
+  command = "bun install --frozen-lockfile && bun run build"
   publish = ".next"
 
 # Next.js Plugin - Essential for Next.js on Netlify
@@ -52,5 +52,5 @@
 
 # Build environment
 [build.environment]
+  BUN_VERSION = "1.3.13"
   NODE_VERSION = "20"
-  NPM_FLAGS = "--legacy-peer-deps"

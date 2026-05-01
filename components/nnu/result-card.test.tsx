@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach } from 'bun:test';
 import { render, screen, cleanup, within } from '@testing-library/react';
 import { ResultCard } from './result-card';
 import type { EvaluationResult } from '@/lib/types';

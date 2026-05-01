@@ -78,7 +78,7 @@ node test-polished-version.js
 ```
 
 ### 方法 2：手动测试
-1. 启动开发服务器：`npm run dev`
+1. 启动开发服务器：`bun dev`
 2. 访问评测页面
 3. 点击"填入示例"
 4. 提交评测

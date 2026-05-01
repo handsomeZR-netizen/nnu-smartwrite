@@ -1,7 +1,6 @@
-import { describe, it, expect, vi, afterEach } from "vitest";
+import { describe, it, expect, mock, afterEach } from "bun:test";
 import { render, screen, waitFor, cleanup } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import "@testing-library/jest-dom/vitest";
 import * as fc from "fast-check";
 import { EvaluationForm } from "./evaluation-form";
 import type { EvaluationInput } from "@/lib/types";
@@ -37,7 +36,7 @@ describe("EvaluationForm", () => {
           }),
           async (incompleteInput) => {
             try {
-              const onSubmit = vi.fn();
+              const onSubmit = mock();
               const user = userEvent.setup();
 
               render(
@@ -87,7 +86,7 @@ describe("EvaluationForm", () => {
           }),
           async (completeInput) => {
             try {
-              const onSubmit = vi.fn().mockResolvedValue(undefined);
+              const onSubmit = mock(async () => undefined);
               const user = userEvent.setup();
 
               render(
@@ -141,7 +140,7 @@ describe("EvaluationForm", () => {
               const { rerender } = render(
                 <EvaluationForm
                   initialData={input}
-                  onSubmit={vi.fn()}
+                  onSubmit={mock()}
                   isLoading={true}
                 />
               );
@@ -159,7 +158,7 @@ describe("EvaluationForm", () => {
               rerender(
                 <EvaluationForm
                   initialData={input}
-                  onSubmit={vi.fn()}
+                  onSubmit={mock()}
                   isLoading={false}
                 />
               );
@@ -188,7 +187,7 @@ describe("EvaluationForm", () => {
      * Requirements: 1.2
      */
     it("should prevent submission with empty fields", async () => {
-      const onSubmit = vi.fn();
+      const onSubmit = mock();
       const user = userEvent.setup();
 
       render(<EvaluationForm onSubmit={onSubmit} isLoading={false} />);
@@ -212,7 +211,7 @@ describe("EvaluationForm", () => {
      * Requirements: 1.2
      */
     it("should display correct validation error messages", async () => {
-      const onSubmit = vi.fn();
+      const onSubmit = mock();
       const user = userEvent.setup();
 
       render(<EvaluationForm onSubmit={onSubmit} isLoading={false} />);
@@ -234,7 +233,7 @@ describe("EvaluationForm", () => {
      * Requirements: 1.2
      */
     it("should allow submission with valid input", async () => {
-      const onSubmit = vi.fn().mockResolvedValue(undefined);
+      const onSubmit = mock(async () => undefined);
       const user = userEvent.setup();
 
       render(<EvaluationForm onSubmit={onSubmit} isLoading={false} />);

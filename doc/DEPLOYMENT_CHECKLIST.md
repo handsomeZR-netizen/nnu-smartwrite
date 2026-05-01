@@ -5,9 +5,9 @@
 ## 代码准备
 
 - [ ] 所有功能已完成并测试通过
-- [ ] 运行 `npm run test` 确保所有测试通过
-- [ ] 运行 `npm run lint` 确保代码质量
-- [ ] 运行 `npm run build` 确保构建成功
+- [ ] 运行 `bun test` 确保所有测试通过
+- [ ] 运行 `bun run lint` 确保代码质量
+- [ ] 运行 `bun run build` 确保构建成功
 - [ ] 检查控制台无错误和警告
 
 ## 环境配置
@@ -69,7 +69,7 @@
 ## Netlify 配置
 
 - [ ] `netlify.toml` 已创建并配置正确
-- [ ] 构建命令设置为 `npm run build`
+- [ ] 构建命令设置为 `bun install --frozen-lockfile && bun run build`
 - [ ] 发布目录设置为 `.next`
 - [ ] Node 版本设置为 20
 - [ ] 重定向规则已配置

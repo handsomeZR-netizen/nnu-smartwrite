@@ -26,7 +26,7 @@ git push origin main
 Netlify 会自动检测到 Next.js 项目，但请确认以下设置：
 
 - **Branch to deploy**: `main`
-- **Build command**: `npm run build`
+- **Build command**: `bun install --frozen-lockfile && bun run build`
 - **Publish directory**: `.next`
 - **Node version**: `20`
 
@@ -82,7 +82,7 @@ NEXT_PUBLIC_APP_URL = https://your-site-name.netlify.app
 
 ### 安装 Netlify CLI
 ```bash
-npm install -g netlify-cli
+bun install -g netlify-cli
 ```
 
 ### 登录 Netlify
@@ -120,9 +120,9 @@ netlify deploy --prod
 **解决方案**：
 ```bash
 # 清理并重新安装依赖
-rm -rf node_modules package-lock.json
-npm install
-git add package-lock.json
+rm -rf node_modules bun.lock
+bun install
+git add bun.lock
 git commit -m "更新依赖"
 git push
 ```

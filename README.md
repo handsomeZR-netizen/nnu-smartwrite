@@ -23,7 +23,7 @@
 ## Quick Start
 
 ```bash
-npm install && npm run build
+bun install && bun run build
 ```
 
 <!-- PORTFOLIO-SNAPSHOT:END -->
@@ -72,13 +72,13 @@ DEEPSEEK_API_KEY=your_api_key_here
 ### 安装依赖
 
 ```bash
-npm install
+bun install
 ```
 
 ### 运行开发服务器
 
 ```bash
-npm run dev
+bun dev
 ```
 
 打开 [http://localhost:3000](http://localhost:3000) 查看应用。
@@ -86,8 +86,8 @@ npm run dev
 ### 构建生产版本
 
 ```bash
-npm run build
-npm start
+bun run build
+bun start
 ```
 
 ## 项目结构
@@ -161,23 +161,20 @@ nnu-smartwrite/
 
 ```bash
 # 运行所有测试
-npm run test
+bun test
 
 # 运行测试并监听变化
-npm run test:watch
-
-# 运行测试 UI
-npm run test:ui
+bun test --watch
 ```
 
 ## 代码质量
 
 ```bash
 # 检查代码质量
-npm run lint
+bun run lint
 
 # 格式化代码
-npm run format
+bun run format
 ```
 
 ## License

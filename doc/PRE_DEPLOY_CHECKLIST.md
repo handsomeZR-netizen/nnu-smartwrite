@@ -16,12 +16,12 @@
 
 - [ ] 本地构建成功
   ```bash
-  npm run build
+  bun run build
   ```
 
 - [ ] 本地测试通过
   ```bash
-  npm run dev
+  bun dev
   # 访问 http://localhost:3000 测试所有功能
   ```
 
@@ -66,12 +66,12 @@
 
 - [ ] 所有依赖已安装
   ```bash
-  npm install
+  bun install
   ```
 
 - [ ] 没有安全漏洞（或已知晓）
   ```bash
-  npm audit
+  bun audit
   ```
 
 - [ ] Node 版本兼容（推荐 v20）
@@ -104,7 +104,7 @@
 
 - [ ] 构建产物大小合理（< 50MB）
   ```bash
-  npm run build
+  bun run build
   du -sh .next
   ```
 

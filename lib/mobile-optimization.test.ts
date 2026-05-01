@@ -4,7 +4,7 @@
  * Validates: Requirements 7.3
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from 'bun:test';
 import * as fc from 'fast-check';
 
 /**

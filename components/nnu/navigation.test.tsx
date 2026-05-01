@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach } from 'bun:test';
 import { render, screen, cleanup } from '@testing-library/react';
 import * as fc from 'fast-check';
 import { Navigation } from './navigation';

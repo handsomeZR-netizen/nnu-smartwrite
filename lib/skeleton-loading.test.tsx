@@ -5,7 +5,7 @@
  * Validates: Requirements 8.2
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from 'bun:test';
 import { render, screen } from '@testing-library/react';
 import * as fc from 'fast-check';
 import {

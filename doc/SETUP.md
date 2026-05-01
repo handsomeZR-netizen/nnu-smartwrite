@@ -87,13 +87,13 @@ nnu-smartwrite/
 
 ```bash
 # 开发模式
-npm run dev
+bun dev
 
 # 构建生产版本
-npm run build
+bun run build
 
 # 运行生产版本
-npm start
+bun start
 ```
 
 访问 http://localhost:3000 查看应用。
@@ -102,5 +102,5 @@ npm start
 - **框架**: Next.js 16.0.4 (App Router)
 - **语言**: TypeScript
 - **样式**: Tailwind CSS v4
-- **包管理器**: npm
+- **包管理器**: bun
 - **Node版本要求**: >= 18.17.0
