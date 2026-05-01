@@ -1,5 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { EvaluationInputSchema, type EvaluationResult, type EvaluationType } from '@/lib/types';
+import {
+  EvaluationInputSchema,
+  type EvaluationResult,
+  type EvaluationType,
+  type IssueSpan,
+  type IssueType,
+  type SentenceAnnotation,
+} from '@/lib/types';
 import { buildSystemPrompt, createEvaluationPrompt, detectEvaluationType } from '@/lib/ai-prompt';
 import { sanitizeEvaluationInput } from '@/lib/utils';
 
@@ -88,6 +95,106 @@ function getDefaultRadarLabels(evaluationType?: EvaluationType): [string, string
 }
 
 /**
+ * 校验并归一化 numeric_score：必须是 0-100 数字（接受字符串数字），
+ * 否则返回 undefined（不污染响应）。
+ */
+function normalizeNumericScore(raw: unknown): number | undefined {
+  const n = typeof raw === 'string' ? Number(raw) : (raw as number);
+  if (typeof n !== 'number' || !Number.isFinite(n)) return undefined;
+  if (n < 0 || n > 100) return undefined;
+  // 0-100 整数（允许小数但 round 一下，保持序列化稳定）
+  return Math.round(n * 100) / 100;
+}
+
+const VALID_ISSUE_TYPES: ReadonlySet<IssueType> = new Set([
+  'grammar',
+  'spelling',
+  'vocab',
+  'style',
+  'logic',
+]);
+
+/**
+ * 校验单个 issue：
+ * - type 必须在白名单
+ * - span = [start, end] 满足 0 ≤ start < end ≤ text.length
+ * - message 非空字符串
+ * 不合法时返回 null，由调用方丢弃。
+ */
+function normalizeIssue(raw: unknown, textLength: number): IssueSpan | null {
+  if (!raw || typeof raw !== 'object') return null;
+  const r = raw as Record<string, unknown>;
+
+  const type = typeof r.type === 'string' ? (r.type as string) : '';
+  if (!VALID_ISSUE_TYPES.has(type as IssueType)) return null;
+
+  const spanRaw = r.span;
+  if (!Array.isArray(spanRaw) || spanRaw.length !== 2) return null;
+  const start = Number(spanRaw[0]);
+  const end = Number(spanRaw[1]);
+  if (!Number.isFinite(start) || !Number.isFinite(end)) return null;
+  if (!(start >= 0 && end > start && end <= textLength)) return null;
+
+  const message = typeof r.message === 'string' ? r.message.trim() : '';
+  if (!message) return null;
+
+  const suggestion =
+    typeof r.suggestion === 'string' && r.suggestion.trim()
+      ? r.suggestion.trim()
+      : undefined;
+
+  return {
+    type: type as IssueType,
+    span: [Math.floor(start), Math.floor(end)],
+    message,
+    suggestion,
+  };
+}
+
+/**
+ * 校验并归一化 sentence_annotations 数组。
+ * - 任何非法 issue 被丢弃（不影响整句和其他 issue）
+ * - sentenceIndex 非负；text 必须存在且非空
+ */
+function normalizeSentenceAnnotations(raw: unknown): SentenceAnnotation[] | undefined {
+  if (!Array.isArray(raw)) return undefined;
+  const out: SentenceAnnotation[] = [];
+
+  for (const item of raw) {
+    if (!item || typeof item !== 'object') continue;
+    const r = item as Record<string, unknown>;
+
+    // 兼容 sentence_index / sentenceIndex
+    const idxRaw = r.sentence_index ?? r.sentenceIndex;
+    const idx = Number(idxRaw);
+    if (!Number.isFinite(idx) || idx < 0) continue;
+
+    const text = typeof r.text === 'string' ? r.text : '';
+    if (!text) continue;
+
+    const issuesRaw = Array.isArray(r.issues) ? r.issues : [];
+    const issues: IssueSpan[] = [];
+    for (const iss of issuesRaw) {
+      const norm = normalizeIssue(iss, text.length);
+      if (norm) issues.push(norm);
+      if (issues.length >= 3) break; // 每句最多 3 条
+    }
+
+    const comment =
+      typeof r.comment === 'string' && r.comment.trim() ? r.comment.trim() : undefined;
+
+    out.push({
+      sentenceIndex: Math.floor(idx),
+      text,
+      issues,
+      comment,
+    });
+  }
+
+  return out.length > 0 ? out : undefined;
+}
+
+/**
  * 解析AI返回的JSON响应（增强版）
  * 将snake_case字段转换为camelCase，支持新的结构化字段
  * 增强容错能力，处理各种格式的响应
@@ -163,11 +270,21 @@ function parseAIResponse(
       dim2: Number(radarDimsRaw.dim2) || 70,
       dim3: Number(radarDimsRaw.dim3) || 70,
       dim4: Number(radarDimsRaw.dim4) || 70,
-      labels: Array.isArray(radarDimsRaw.labels) && radarDimsRaw.labels.length === 4 
-        ? radarDimsRaw.labels 
+      labels: Array.isArray(radarDimsRaw.labels) && radarDimsRaw.labels.length === 4
+        ? radarDimsRaw.labels
         : getDefaultRadarLabels(evaluationType),
     } : undefined;
-    
+
+    // 处理 numeric_score（百分制总分），无效则丢弃
+    const numericScore = normalizeNumericScore(
+      parsed.numeric_score ?? parsed.numericScore
+    );
+
+    // 处理 sentence_annotations（逐句批注），非法 issue 被丢弃
+    const sentenceAnnotations = normalizeSentenceAnnotations(
+      parsed.sentence_annotations ?? parsed.sentenceAnnotations
+    );
+
     return {
       score: finalScore as 'S' | 'A' | 'B' | 'C',
       isSemanticallyCorrect,
@@ -178,12 +295,14 @@ function parseAIResponse(
       radarDimensions,
       evaluationType,
       reasoningProcess: reasoningContent,
+      numericScore,
+      sentenceAnnotations,
     };
   } catch (error) {
     console.error('Failed to parse AI response:', content);
     console.error('Parse error:', error);
-    
-    // 尝试从非 JSON 响应中提取有用信息
+
+    // JSON.parse 失败时优雅降级：尝试从文本提取，不再 throw
     const fallbackResult = tryExtractFromText(content, evaluationType);
     if (fallbackResult) {
       console.log('Using fallback extraction result');
@@ -192,8 +311,24 @@ function parseAIResponse(
         reasoningProcess: reasoningContent,
       };
     }
-    
-    throw new Error(`Failed to parse AI response as JSON: ${error instanceof Error ? error.message : 'Unknown error'}`);
+
+    // 兜底：返回一个最小可用的结果，避免 500
+    console.warn('Falling back to minimal default result after parse failure');
+    return {
+      score: 'B',
+      isSemanticallyCorrect: true,
+      analysis: 'AI 响应格式异常，已使用默认评估结果。请稍后重试以获取完整评估。',
+      polishedVersion: '',
+      radarDimensions: {
+        dim1: 70,
+        dim2: 70,
+        dim3: 70,
+        dim4: 70,
+        labels: getDefaultRadarLabels(evaluationType),
+      },
+      evaluationType,
+      reasoningProcess: reasoningContent,
+    };
   }
 }
 
@@ -463,6 +598,19 @@ export async function POST(request: NextRequest) {
             effort: body.reasoning.effort === 'max' ? 'max' : 'high',
           }
         : undefined;
+
+    // 可选：自定义评分细则（rubric）与维度权重（scoreWeights, 总和应 ≈ 100）
+    const rubric: string | undefined =
+      typeof body.rubric === 'string' && body.rubric.trim() ? body.rubric : undefined;
+    let scoreWeights: Record<string, number> | undefined;
+    if (body.scoreWeights && typeof body.scoreWeights === 'object' && !Array.isArray(body.scoreWeights)) {
+      const cleaned: Record<string, number> = {};
+      for (const [k, v] of Object.entries(body.scoreWeights as Record<string, unknown>)) {
+        const n = typeof v === 'string' ? Number(v) : (v as number);
+        if (typeof n === 'number' && Number.isFinite(n)) cleaned[k] = n;
+      }
+      if (Object.keys(cleaned).length > 0) scoreWeights = cleaned;
+    }
     
     // 清理输入（防止XSS和注入攻击）
     const sanitizedBody = {
@@ -517,9 +665,9 @@ export async function POST(request: NextRequest) {
       parsedResponse = generateMockResponse(evaluationType);
     } else {
       // 正常模式：调用真实 API
-      // 构建动态系统提示词（传入模式和类型）
-      const systemPrompt = buildSystemPrompt(mode, evaluationType);
-      
+      // 构建动态系统提示词（传入模式和类型 + 可选 rubric / 权重）
+      const systemPrompt = buildSystemPrompt(mode, evaluationType, rubric, scoreWeights);
+
       // 构建消息
       const messages: DeepSeekMessage[] = [
         { role: 'system', content: systemPrompt },
