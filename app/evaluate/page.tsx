@@ -13,6 +13,8 @@ import { Pulse, GraduationCap, Warning, ArrowCounterClockwise, ArrowLeft, Trash,
 import { FollowUpChat } from "@/components/nnu/followup-chat";
 import { ThinkingModeToggle } from "@/components/nnu/thinking-mode-toggle";
 import { PromptLibraryPanel, type PromptTemplate } from "@/components/nnu/prompt-library-panel";
+import { CollapsibleCard } from "@/components/ui/collapsible-card";
+import { ChatCircleDots } from "@phosphor-icons/react";
 import promptLibraryData from "@/data/prompt-library.json";
 
 const ResultCard = dynamic(
@@ -212,8 +214,8 @@ function EvaluatePageInner() {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-          {/* 左侧：输入区 */}
-          <div className="lg:col-span-7 space-y-6">
+          {/* 左侧：输入区（lg+ 抽拉式 sticky） */}
+          <div className="lg:col-span-7 lg:sticky lg:top-24 lg:self-start space-y-6 print:!static">
             <Card className="bg-white rounded-xl shadow-xl border-t-4 border-nnu-green">
               <CardContent className="p-6">
                 <EvaluationForm
@@ -290,7 +292,14 @@ function EvaluatePageInner() {
                   <ResultCard result={result} showRadarChart={!!(result.radarScores || result.radarDimensions)} />
                 </div>
 
-                <FollowUpChat input={currentInput} result={result} />
+                <CollapsibleCard
+                  title="继续追问 AI"
+                  subtitle="基于本次评测多轮提问"
+                  icon={<ChatCircleDots className="w-4 h-4" weight="fill" />}
+                  accent="green"
+                >
+                  <FollowUpChat input={currentInput} result={result} />
+                </CollapsibleCard>
 
                 {/* 操作按钮 */}
                 <div className="flex flex-wrap gap-3 justify-center print:hidden">

@@ -1,11 +1,21 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { CollapsibleCard } from '@/components/ui/collapsible-card';
 import type { EvaluationResult } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { RadarChart } from './radar-chart';
 import { AnnotatedEssay } from './annotated-essay';
-import { ChartBar, CheckCircle, BookOpen, WarningCircle, CaretRight, Lightbulb, XCircle, Brain, MapPin } from '@phosphor-icons/react';
+import {
+  ChartBar,
+  CheckCircle,
+  BookOpen,
+  XCircle,
+  Brain,
+  MapPin,
+  Lightbulb,
+  Scales,
+} from '@phosphor-icons/react';
 
 export interface ResultCardProps {
   result: EvaluationResult;
@@ -112,101 +122,32 @@ const NumericScoreRing: React.FC<NumericScoreRingProps> = ({ numericScore }) => 
   );
 };
 
-
 export const ResultCard: React.FC<ResultCardProps> = ({ result, showRadarChart = false }) => {
   const {
     score,
     numericScore,
-    isSemanticallyCorrect,
     analysis,
     analysisBreakdown,
     polishedVersion,
     sentenceAnnotations,
     evaluationType,
-    reasoningProcess
+    reasoningProcess,
   } = result;
 
   const hasSentenceAnnotations = Array.isArray(sentenceAnnotations) && sentenceAnnotations.length > 0;
+  const strengths = analysisBreakdown?.strengths ?? [];
+  const weaknesses = analysisBreakdown?.weaknesses ?? [];
+  const contextMatch = analysisBreakdown?.contextMatch;
+  const hasStructuredBreakdown = Boolean(analysisBreakdown);
 
   const [selectedDimension, setSelectedDimension] = useState<string | null>(null);
-  const [showReasoning, setShowReasoning] = useState(false);
-
-  // 使用结构化分析（如果有），否则回退到传统分析
-  const analysisDetails = analysisBreakdown ? [
-    {
-      type: 'strengths',
-      title: '亮点与优势',
-      icon: <CheckCircle className="w-5 h-5 text-green-600" />,
-      content: analysisBreakdown.strengths.length > 0 
-        ? analysisBreakdown.strengths 
-        : ['整体表达流畅'],
-      bgColor: 'bg-green-50',
-      borderColor: 'border-green-100',
-    },
-    {
-      type: 'weaknesses',
-      title: '待改进之处',
-      icon: <XCircle className="w-5 h-5 text-red-600" />,
-      content: analysisBreakdown.weaknesses.length > 0 
-        ? analysisBreakdown.weaknesses 
-        : ['暂无明显问题'],
-      bgColor: 'bg-red-50',
-      borderColor: 'border-red-100',
-    },
-    {
-      type: 'context',
-      title: '语境契合度分析',
-      icon: <BookOpen className="w-5 h-5 text-blue-600" />,
-      content: analysisBreakdown.contextMatch || '与语境匹配良好',
-      bgColor: 'bg-blue-50',
-      borderColor: 'border-blue-100',
-    },
-    {
-      type: 'suggestion',
-      title: '专家润色建议 (Polished Version)',
-      icon: <Lightbulb className="w-5 h-5 text-nnu-gold" />,
-      content: polishedVersion,
-      bgColor: 'bg-nnu-paper',
-      borderColor: 'border-nnu-gold/30',
-    },
-  ] : [
-    {
-      type: isSemanticallyCorrect ? 'success' : 'warning',
-      title: '语义等价判定',
-      icon: isSemanticallyCorrect 
-        ? <CheckCircle className="w-5 h-5 text-green-600" />
-        : <WarningCircle className="w-5 h-5 text-yellow-600" />,
-      content: isSemanticallyCorrect 
-        ? '你的表达在语义上与标准答案等价，AI 判定为正确。'
-        : '你的表达与标准答案存在语义差异，建议参考润色建议进行改进。',
-      bgColor: isSemanticallyCorrect ? 'bg-green-50' : 'bg-yellow-50',
-      borderColor: isSemanticallyCorrect ? 'border-green-100' : 'border-yellow-100',
-    },
-    {
-      type: 'info',
-      title: '语境契合度',
-      icon: <BookOpen className="w-5 h-5 text-blue-600" />,
-      content: analysis,
-      bgColor: 'bg-blue-50',
-      borderColor: 'border-blue-100',
-    },
-    {
-      type: 'suggestion',
-      title: 'AI 润色建议',
-      icon: <Lightbulb className="w-5 h-5 text-nnu-gold" />,
-      content: polishedVersion,
-      bgColor: 'bg-nnu-paper',
-      borderColor: 'border-nnu-gold/30',
-    },
-  ];
 
   return (
-    <Card 
+    <Card
       className="bg-white rounded-xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-700"
       role="article"
       aria-label="评估结果卡片"
     >
-      {/* Header */}
       <CardHeader className="bg-nnu-green p-4 text-white flex flex-row justify-between items-center">
         <h3 className="font-bold flex items-center gap-2">
           <ChartBar className="w-5 h-5" />
@@ -217,9 +158,9 @@ export const ResultCard: React.FC<ResultCardProps> = ({ result, showRadarChart =
         </span>
       </CardHeader>
 
-      <CardContent className="p-6">
-        {/* Score and Radar */}
-        <div className="flex items-center justify-between flex-wrap gap-y-4 mb-6">
+      <CardContent className="p-6 space-y-4">
+        {/* Headline: 评级 / 具体分数 / 雷达 — always visible */}
+        <div className="flex items-center justify-between flex-wrap gap-y-4">
           <div className="text-center">
             <div className="text-sm text-gray-500 mb-1">综合评级</div>
             <div
@@ -255,34 +196,15 @@ export const ResultCard: React.FC<ResultCardProps> = ({ result, showRadarChart =
           )}
         </div>
 
-        {/* AI 总评 */}
-        <div className="text-gray-700 leading-relaxed border-l-4 border-nnu-green pl-4 py-2 bg-gray-50 mb-4">
+        {/* AI 总评 — short, always visible */}
+        <div className="text-gray-700 leading-relaxed border-l-4 border-nnu-green pl-4 py-2 bg-gray-50">
           <h4 className="text-sm font-bold text-nnu-green mb-1">AI 总评</h4>
           <p className="text-sm">{analysis}</p>
         </div>
 
-        {/* Reasoning Process (if available) */}
-        {reasoningProcess && (
-          <div className="mb-4">
-            <button
-              type="button"
-              onClick={() => setShowReasoning(!showReasoning)}
-              className="flex items-center gap-2 text-sm text-nnu-green hover:underline"
-            >
-              <Brain className="w-4 h-4" />
-              {showReasoning ? '隐藏' : '查看'} AI 推理过程
-            </button>
-            {showReasoning && (
-              <div className="mt-2 p-3 bg-gray-50 rounded-lg border border-gray-200 text-xs text-gray-600 leading-relaxed">
-                {reasoningProcess}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Selected Dimension Highlight */}
+        {/* Selected dimension highlight (kept inline) */}
         {selectedDimension && (
-          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-blue-900">
                 已选择维度: {selectedDimension}
@@ -291,6 +213,7 @@ export const ResultCard: React.FC<ResultCardProps> = ({ result, showRadarChart =
                 type="button"
                 onClick={() => setSelectedDimension(null)}
                 className="text-blue-600 hover:text-blue-800"
+                aria-label="清除维度选择"
               >
                 <XCircle className="w-4 h-4" />
               </button>
@@ -298,72 +221,111 @@ export const ResultCard: React.FC<ResultCardProps> = ({ result, showRadarChart =
           </div>
         )}
 
-        {/* 详细列表展示 */}
-        <div className="grid gap-4">
-          {analysisDetails.map((section, idx) => (
-            <div 
-              key={idx} 
-              className={cn(
-                "p-4 rounded-lg border transition-all",
-                section.bgColor,
-                section.borderColor,
-                selectedDimension && section.title.includes(selectedDimension) 
-                  ? "ring-2 ring-blue-400" 
-                  : ""
-              )}
-            >
-              <div className="flex items-center gap-2 mb-3">
-                {section.icon}
-                <h4 className="font-bold text-gray-900">{section.title}</h4>
-              </div>
-              {Array.isArray(section.content) ? (
+        {/* Collapsible: 亮点与改进 */}
+        {hasStructuredBreakdown && (strengths.length > 0 || weaknesses.length > 0) && (
+          <CollapsibleCard
+            title="亮点与改进"
+            subtitle={`${strengths.length} 优 · ${weaknesses.length} 待改进`}
+            icon={<Scales className="w-4 h-4" weight="fill" />}
+            accent="green"
+            defaultOpen
+          >
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="p-3 rounded-lg bg-green-50 border border-green-100">
+                <div className="flex items-center gap-2 mb-2">
+                  <CheckCircle className="w-4 h-4 text-green-600" weight="fill" />
+                  <h4 className="text-sm font-bold text-green-900">亮点与优势</h4>
+                </div>
                 <ul className="space-y-2">
-                  {section.content.map((item, i) => (
+                  {(strengths.length > 0 ? strengths : ['整体表达流畅']).map((item, i) => (
                     <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
-                      <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-gray-400 shrink-0" />
+                      <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-green-500 shrink-0" />
                       <span>{item}</span>
                     </li>
                   ))}
                 </ul>
-              ) : (
-                <p className={cn(
-                  "text-sm leading-relaxed",
-                  section.type === 'suggestion' 
-                    ? "text-gray-800 font-mono bg-white p-3 rounded border border-gray-200 italic" 
-                    : "text-gray-700 font-medium"
-                )}>
-                  {section.content}
-                </p>
-              )}
+              </div>
+              <div className="p-3 rounded-lg bg-red-50 border border-red-100">
+                <div className="flex items-center gap-2 mb-2">
+                  <XCircle className="w-4 h-4 text-red-600" weight="fill" />
+                  <h4 className="text-sm font-bold text-red-900">待改进之处</h4>
+                </div>
+                <ul className="space-y-2">
+                  {(weaknesses.length > 0 ? weaknesses : ['暂无明显问题']).map((item, i) => (
+                    <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                      <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
-          ))}
-        </div>
-
-        {/* 逐句批注（折叠） */}
-        {hasSentenceAnnotations && (
-          <details className="mt-6 group rounded-lg border border-gray-200 bg-white/60 backdrop-blur-sm overflow-hidden">
-            <summary className="flex items-center justify-between gap-2 cursor-pointer list-none px-4 py-3 text-sm font-semibold text-nnu-green hover:bg-nnu-green/5 transition-colors">
-              <span className="flex items-center gap-2">
-                <MapPin className="w-4 h-4" weight="fill" />
-                逐句批注
-                <span className="text-xs font-normal text-gray-500">
-                  共 {sentenceAnnotations?.length} 句
-                </span>
-              </span>
-              <CaretRight className="w-4 h-4 transition-transform group-open:rotate-90 text-gray-400" />
-            </summary>
-            <div className="px-4 pb-4 pt-2 border-t border-gray-100 bg-gray-50/40">
-              <AnnotatedEssay sentenceAnnotations={sentenceAnnotations ?? []} />
-            </div>
-          </details>
+          </CollapsibleCard>
         )}
 
-        {/* Footer */}
-        <div className="mt-6 pt-4 border-t border-gray-100 flex justify-between items-center">
-          <span className="text-xs text-gray-400">Powered by NNU SmartWrite Engine</span>
-          <button type="button" className="text-xs text-nnu-green font-bold hover:underline flex items-center">
-            查看完整报告 <CaretRight className="w-3 h-3" />
-          </button>
+        {/* Collapsible: 语境契合度分析 */}
+        {hasStructuredBreakdown && contextMatch && (
+          <CollapsibleCard
+            title="语境契合度分析"
+            icon={<BookOpen className="w-4 h-4" weight="fill" />}
+            accent="blue"
+          >
+            <p className="text-sm leading-relaxed text-gray-700">{contextMatch}</p>
+          </CollapsibleCard>
+        )}
+
+        {/* Collapsible: 专家润色建议（含全文） */}
+        {polishedVersion && (
+          <CollapsibleCard
+            title="专家润色建议"
+            subtitle="Polished Version"
+            icon={<Lightbulb className="w-4 h-4" weight="fill" />}
+            accent="amber"
+          >
+            <p className="text-sm leading-relaxed text-gray-800 font-mono bg-white/80 p-3 rounded border border-gray-200 italic whitespace-pre-wrap">
+              {polishedVersion}
+            </p>
+          </CollapsibleCard>
+        )}
+
+        {/* Fallback: 无 analysisBreakdown 时显示传统单段分析 */}
+        {!hasStructuredBreakdown && analysis && (
+          <div className="p-3 rounded-lg bg-blue-50 border border-blue-100">
+            <div className="flex items-center gap-2 mb-2">
+              <BookOpen className="w-4 h-4 text-blue-600" weight="fill" />
+              <h4 className="text-sm font-bold text-blue-900">语境契合度</h4>
+            </div>
+            <p className="text-sm leading-relaxed text-gray-700">{analysis}</p>
+          </div>
+        )}
+
+        {/* Collapsible: 逐句批注 */}
+        {hasSentenceAnnotations && (
+          <CollapsibleCard
+            title="逐句批注"
+            subtitle={`共 ${sentenceAnnotations?.length} 句`}
+            icon={<MapPin className="w-4 h-4" weight="fill" />}
+            accent="coral"
+          >
+            <AnnotatedEssay sentenceAnnotations={sentenceAnnotations ?? []} />
+          </CollapsibleCard>
+        )}
+
+        {/* Collapsible: AI 推理过程 */}
+        {reasoningProcess && (
+          <CollapsibleCard
+            title="AI 推理过程"
+            icon={<Brain className="w-4 h-4" weight="fill" />}
+            accent="gray"
+          >
+            <div className="text-xs text-gray-600 leading-relaxed whitespace-pre-wrap">
+              {reasoningProcess}
+            </div>
+          </CollapsibleCard>
+        )}
+
+        <div className="pt-3 border-t border-gray-100 text-xs text-gray-400 text-center">
+          Powered by NNU SmartWrite Engine
         </div>
       </CardContent>
     </Card>
