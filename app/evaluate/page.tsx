@@ -203,11 +203,11 @@ function EvaluatePageInner() {
     <div className="min-h-screen bg-nnu-paper pt-24 pb-8 px-4">
       <PromptLibraryPanel onApply={handleApplyTemplate} />
       <div className="container mx-auto max-w-7xl">
-        {/* iOS 26 Liquid Glass thinking-mode control bar */}
+        {/* Thinking-mode control bar */}
         <div className="mb-5 flex items-center justify-between flex-wrap gap-3 print:hidden">
-          <div className="flex items-center gap-2 text-xs text-gray-500">
-            <span className="w-2 h-2 rounded-full bg-nnu-green/70 shadow-[0_0_0_4px_rgba(31,106,82,0.12)]" />
-            <span>当前模型 deepseek-v4-flash · 思考模式可调</span>
+          <div className="flex items-center gap-2 text-xs text-stone-500">
+            <span className="w-1.5 h-1.5 rounded-full bg-stone-400 shadow-[0_0_0_3px_rgba(120,113,108,0.12)]" />
+            <span className="font-medium">deepseek-v4-flash · 思考模式可调</span>
           </div>
           <ThinkingModeToggle />
         </div>
