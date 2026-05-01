@@ -26,10 +26,12 @@ export default function EvaluatePage() {
   const [error, setError] = React.useState<APIError | null>(null);
   const [currentInput, setCurrentInput] = React.useState<EvaluationInput | null>(null);
   const [seedFromTemplate, setSeedFromTemplate] = React.useState<Partial<EvaluationInput> | null>(null);
+  const [appliedTemplate, setAppliedTemplate] = React.useState<PromptTemplate | null>(null);
   const showResult = !!result;
 
   const handleApplyTemplate = (t: PromptTemplate) => {
     setSeedFromTemplate({ directions: t.directionsTemplate });
+    setAppliedTemplate(t);
   };
 
   // 页面加载时恢复上次的评测结果
@@ -62,6 +64,10 @@ export default function EvaluatePage() {
         customAPIModel: settings.api.customAPIModel,
       } : {}),
       ...(settings?.reasoning ? { reasoning: settings.reasoning } : {}),
+      ...(appliedTemplate ? {
+        rubric: appliedTemplate.rubric,
+        scoreWeights: appliedTemplate.scoreWeights,
+      } : {}),
     };
     
     const response = await fetch('/api/evaluate', {

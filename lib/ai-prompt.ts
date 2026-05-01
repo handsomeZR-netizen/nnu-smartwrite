@@ -98,6 +98,7 @@ You MUST respond with valid JSON in this EXACT format (no markdown code blocks):
 
 {
   "score": "S" | "A" | "B" | "C",
+  "numeric_score": 0-100,
   "is_semantically_correct": boolean,
   "analysis": "Brief Chinese summary (100-200 chars, 中文总评)",
   "analysis_breakdown": {
@@ -118,11 +119,34 @@ You MUST respond with valid JSON in this EXACT format (no markdown code blocks):
     "dim3": 0-100,
     "dim4": 0-100,
     "labels": ["维度1中文名", "维度2中文名", "维度3中文名", "维度4中文名"]
-  }
+  },
+  "sentence_annotations": [
+    {
+      "sentence_index": 0,
+      "text": "the exact original sentence text (verbatim, no edits)",
+      "issues": [
+        {
+          "type": "grammar" | "spelling" | "vocab" | "style" | "logic",
+          "span": [start, end],
+          "message": "中文一句话指出错误（≤30字）",
+          "suggestion": "推荐改法（可省略）"
+        }
+      ],
+      "comment": "中文整句点评，关注衔接逻辑/扣题（可省略）"
+    }
+  ]
 }
 
+**SENTENCE ANNOTATION RULES (逐句批注规则):**
+- 把学生原文按句号 / 问号 / 感叹号切句，按出现顺序填入 sentence_annotations。sentence_index 从 0 开始递增。
+- 每个 sentence_annotations 项的 "text" 必须与切出的原句逐字一致（不要修正拼写、不要补标点）。
+- "issues" 中每条的 "span" 用 [start, end) **半开区间**（end 不包含），相对于该句 "text" 的字符索引；必须满足 0 ≤ start < end ≤ text.length。
+- 每句的 "issues" 数组最多 3 条；如果该句无明显错误，issues 留空数组 []。
+- type 取值固定为下列五选一：grammar（语法）、spelling（拼写）、vocab（词汇/搭配）、style（文体/中式英语）、logic（逻辑/衔接）。
+- 整篇的 numeric_score（0-100 整数）须与等级 S/A/B/C 大致一致（S≥85、A 70-84、B 55-69、C<55）。
+
 **CRITICAL RULES (重要规则):**
-- analysis, strengths, weaknesses, contextMatch → Chinese (中文)
+- analysis, strengths, weaknesses, contextMatch, sentence comments / issue messages → Chinese (中文)
 - polished_version → ENGLISH ONLY (只能是英文！)
 - Quote specific text from student's submission
 - Provide detailed, evidence-based analysis
@@ -152,32 +176,80 @@ export function detectEvaluationType(directions: string): EvaluationType {
 }
 
 /**
+ * 把可选的 rubric / scoreWeights 拼接成 system prompt 末尾的附加指令
+ *
+ * - rubric: 自定义评分细则（自由文本，比如老师贴的扣分项清单）
+ * - scoreWeights: 各维度权重（如 { 内容: 30, 语言: 40, 结构: 20, 拼写: 10 }），
+ *   总和应 ≈ 100；非数字或 NaN 会被忽略。
+ */
+function buildRubricAddendum(
+  rubric?: string,
+  scoreWeights?: Record<string, number>
+): string {
+  const trimmedRubric = rubric?.trim();
+  const weightEntries = scoreWeights
+    ? Object.entries(scoreWeights).filter(
+        ([, v]) => typeof v === 'number' && Number.isFinite(v)
+      )
+    : [];
+
+  if (!trimmedRubric && weightEntries.length === 0) return '';
+
+  const parts: string[] = ['\n\n**本次评测请按以下评分细则与权重：**'];
+  if (trimmedRubric) {
+    parts.push('\n[评分细则 (Rubric)]:\n' + trimmedRubric);
+  }
+  if (weightEntries.length > 0) {
+    const weightSum = weightEntries.reduce((acc, [, v]) => acc + (v as number), 0);
+    const weightLines = weightEntries
+      .map(([k, v]) => `- ${k}: ${v}`)
+      .join('\n');
+    parts.push(
+      `\n[维度权重 (Score Weights, 总和≈100, 当前=${weightSum})]:\n${weightLines}`
+    );
+    parts.push(
+      '\n请让 numeric_score 反映这些维度的加权得分；并在 analysis_breakdown 中分别针对各维度作点评。'
+    );
+  }
+  return parts.join('');
+}
+
+/**
  * 构建动态系统提示词（根据评估模式和类型）
+ *
+ * @param mode - 评估模式
+ * @param evaluationType - 评估题型
+ * @param rubric - 可选自定义评分细则（追加到 system prompt 末尾）
+ * @param scoreWeights - 可选维度权重（总和应 ≈ 100）
  */
 export function buildSystemPrompt(
   mode: EvaluationMode = 'sentence',
-  evaluationType?: EvaluationType
+  evaluationType?: EvaluationType,
+  rubric?: string,
+  scoreWeights?: Record<string, number>
 ): string {
+  const addendum = buildRubricAddendum(rubric, scoreWeights);
+
   // 写作题统一使用四六级标准
   if (evaluationType === 'writing') {
     const modePrompt = mode === 'article' ? CET_ARTICLE_PROMPT : CET_SENTENCE_PROMPT;
     const radarHint = `\n**雷达图维度（CET标准）：**\n- 切题 (Relevance): 内容完整性与切题度\n- 丰富 (Variety): 词汇高级度与句式多样性\n- 连贯 (Coherence): 逻辑衔接与过渡词\n- 规范 (Accuracy): 语法准确与拼写规范`;
-    
-    return CET_ROLE + modePrompt + radarHint + OUTPUT_FORMAT;
+
+    return CET_ROLE + modePrompt + radarHint + OUTPUT_FORMAT + addendum;
   }
-  
+
   // 翻译题保持原有逻辑（也可以使用四六级翻译标准）
   if (evaluationType === 'translation') {
     const radarHint = `\n**雷达图维度（四六级翻译标准）：**\n- 准确 (Accuracy): 准确还原原文含义\n- 通顺 (Fluency): 表达流畅自然\n- 词汇 (Vocabulary): 词汇选择恰当\n- 句法 (Syntax): 句式结构正确`;
-    
-    return CET_ROLE + CET_SENTENCE_PROMPT + radarHint + OUTPUT_FORMAT;
+
+    return CET_ROLE + CET_SENTENCE_PROMPT + radarHint + OUTPUT_FORMAT + addendum;
   }
-  
+
   // 默认使用写作标准
   const modePrompt = mode === 'article' ? CET_ARTICLE_PROMPT : CET_SENTENCE_PROMPT;
   const radarHint = `\n**雷达图维度（CET标准）：**\n- 切题 (Relevance): 内容完整性与切题度\n- 丰富 (Variety): 词汇高级度与句式多样性\n- 连贯 (Coherence): 逻辑衔接与过渡词\n- 规范 (Accuracy): 语法准确与拼写规范`;
-  
-  return CET_ROLE + modePrompt + radarHint + OUTPUT_FORMAT;
+
+  return CET_ROLE + modePrompt + radarHint + OUTPUT_FORMAT + addendum;
 }
 
 /**
