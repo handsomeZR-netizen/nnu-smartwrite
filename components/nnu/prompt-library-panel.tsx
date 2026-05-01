@@ -90,9 +90,11 @@ export const PromptLibraryPanel: React.FC<PromptLibraryPanelProps> = ({
           "transition-transform duration-300 ease-out print:hidden",
           open ? "translate-x-0" : "-translate-x-full",
         )}
-        role="dialog"
-        aria-modal="true"
+        role={open ? "dialog" : undefined}
+        aria-modal={open ? true : undefined}
+        aria-hidden={!open}
         aria-label="提示词库"
+        inert={!open}
       >
         <div className="liquid-glass h-full flex flex-col rounded-r-2xl shadow-2xl">
           <div className="flex items-center justify-between px-5 py-4 border-b border-white/30">
