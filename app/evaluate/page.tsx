@@ -11,6 +11,7 @@ import { ResultCardSkeleton } from "@/components/nnu/skeletons";
 import { Pulse, GraduationCap, Warning, ArrowCounterClockwise, ArrowLeft, Trash, Printer } from "@phosphor-icons/react";
 import { FollowUpChat } from "@/components/nnu/followup-chat";
 import { ThinkingModeToggle } from "@/components/nnu/thinking-mode-toggle";
+import { PromptLibraryPanel, type PromptTemplate } from "@/components/nnu/prompt-library-panel";
 
 const ResultCard = dynamic(
   () => import("@/components/nnu/result-card").then(mod => mod.ResultCard),
@@ -24,7 +25,12 @@ export default function EvaluatePage() {
   const [result, setResult] = React.useState<EvaluationResult | null>(null);
   const [error, setError] = React.useState<APIError | null>(null);
   const [currentInput, setCurrentInput] = React.useState<EvaluationInput | null>(null);
+  const [seedFromTemplate, setSeedFromTemplate] = React.useState<Partial<EvaluationInput> | null>(null);
   const showResult = !!result;
+
+  const handleApplyTemplate = (t: PromptTemplate) => {
+    setSeedFromTemplate({ directions: t.directionsTemplate });
+  };
 
   // 页面加载时恢复上次的评测结果
   React.useEffect(() => {
@@ -162,6 +168,7 @@ export default function EvaluatePage() {
 
   return (
     <div className="min-h-screen bg-nnu-paper pt-24 pb-8 px-4">
+      <PromptLibraryPanel onApply={handleApplyTemplate} />
       <div className="container mx-auto max-w-7xl">
         {/* iOS 26 Liquid Glass thinking-mode control bar */}
         <div className="mb-5 flex items-center justify-between flex-wrap gap-3 print:hidden">
@@ -178,7 +185,11 @@ export default function EvaluatePage() {
           <div className="lg:col-span-7 space-y-6">
             <Card className="bg-white rounded-xl shadow-xl border-t-4 border-nnu-green">
               <CardContent className="p-6">
-                <EvaluationForm onSubmit={handleSubmit} isLoading={isLoading} />
+                <EvaluationForm
+                  onSubmit={handleSubmit}
+                  isLoading={isLoading}
+                  initialData={seedFromTemplate ?? undefined}
+                />
               </CardContent>
             </Card>
           </div>

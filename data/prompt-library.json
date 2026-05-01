@@ -1,0 +1,242 @@
+{
+  "version": "1.0",
+  "categories": [
+    {
+      "id": "cet4-writing",
+      "label": "CET-4 写作",
+      "description": "四级议论文与应用文（120-180 词）评估模板",
+      "templates": [
+        {
+          "id": "cet4-writing-argumentative",
+          "title": "CET-4 议论文（120-180 词）",
+          "summary": "评估观点明确、结构清晰、用词得体的四级议论文",
+          "evaluationFocus": ["切题", "结构", "语法", "词汇"],
+          "scoreWeights": { "relevance": 30, "structure": 25, "grammar": 25, "vocabulary": 20 },
+          "directionsTemplate": "Write a short essay of 120-180 words on the importance of lifelong learning. Your essay should include: (1) why lifelong learning matters in modern society; (2) one example to support your view; (3) what you plan to do.",
+          "rubric": "亮点：观点明确、有 thesis statement、段落清晰（intro-body-conclusion 三段式）、用了 1-2 个高级表达或衔接词。扣分点：跑题、句子单调全是 simple sentence、串句无标点、词汇单调（important / good 反复出现）、结尾草率。",
+          "polishHints": [
+            "把开头的 'I think' 替换成 'It is widely acknowledged that' 等学术化引入",
+            "用 not only…but also… / what is more 等连接词替代简单的 'and'",
+            "结尾给一个具体行动方案，避免空泛喊口号"
+          ],
+          "tags": ["argumentative", "120-180-words", "cet4"]
+        },
+        {
+          "id": "cet4-writing-application-letter",
+          "title": "CET-4 应用文 · 书信",
+          "summary": "评估格式完整、礼貌得体的英文书信（咨询、申请、感谢等）",
+          "evaluationFocus": ["格式", "礼貌得体", "信息完整", "语法"],
+          "scoreWeights": { "format": 30, "completeness": 30, "tone": 20, "grammar": 20 },
+          "directionsTemplate": "You are Li Ming. Write a letter (about 120 words) to the international office of your university to apply for a summer exchange program in Singapore. Include: (1) your motivation; (2) your relevant background; (3) a request for further information.",
+          "rubric": "亮点：格式齐全（称呼 / 正文三段 / 结尾 Yours sincerely / 署名 Li Ming）、礼貌用语恰当、三个信息点都覆盖。扣分点：缺称呼或落款、用词太口语（gonna、wanna）、信息要点漏掉一项、过度重复 I 开头的句子。",
+          "polishHints": [
+            "把 'I want to' 升级为 'I would like to' / 'I am writing to apply for'",
+            "结尾用 'I would appreciate it if you could...' 表达请求",
+            "Yours sincerely 后面记得换行写 Li Ming"
+          ],
+          "tags": ["letter", "application", "cet4"]
+        }
+      ]
+    },
+    {
+      "id": "cet6-writing",
+      "label": "CET-6 写作",
+      "description": "六级议论文与图表作文（150-200 词）评估模板",
+      "templates": [
+        {
+          "id": "cet6-writing-argumentative",
+          "title": "CET-6 议论文（150-200 词）",
+          "summary": "评估有思辨深度、句式多样、用词高级的六级议论文",
+          "evaluationFocus": ["论证深度", "句式多样性", "高级词汇", "连贯性"],
+          "scoreWeights": { "argumentation": 30, "syntax": 25, "vocabulary": 25, "coherence": 20 },
+          "directionsTemplate": "Write an essay of 150-200 words on the impact of artificial intelligence on higher education. Discuss both the benefits and the potential risks, and give your own conclusion.",
+          "rubric": "亮点：能写出 concession-rebuttal 结构（先承认对立观点再反驳）、使用了非谓语 / 倒装 / 虚拟语气至少一种、用了 leverage / undermine / cultivate 等学术词。扣分点：只罗列例子不分析、全是 simple sentence、过度堆砌华丽辞藻但论证空洞、结论与正文脱节。",
+          "polishHints": [
+            "至少出现一处倒装：'Only by combining AI with human judgment can we...'",
+            "用 albeit / nevertheless / paradoxically 等连接副词制造层次",
+            "把 'use AI' 替换为 'leverage AI' 或 'harness AI capabilities'"
+          ],
+          "tags": ["argumentative", "150-200-words", "cet6"]
+        },
+        {
+          "id": "cet6-writing-chart",
+          "title": "CET-6 图表作文",
+          "summary": "评估能准确描述图表趋势并提炼论点的图表作文",
+          "evaluationFocus": ["数据准确", "趋势描述", "论点提炼", "结构"],
+          "scoreWeights": { "data_accuracy": 30, "trend_description": 25, "thesis": 25, "structure": 20 },
+          "directionsTemplate": "The following chart shows changes in Chinese students' reasons for studying abroad from 2010 to 2024. Write an essay of 150-200 words: (1) describe the chart; (2) interpret what the changes reveal; (3) state your view.",
+          "rubric": "亮点：用 the proportion of … rose from X% to Y% / witnessed a steady decline 等图表语料、能从数据提炼出社会现象（如个人发展取代镀金成为主流动机）、有清晰的 'My view is...' 结尾。扣分点：把数据写错、只描述图表不分析、忽略 'state your view' 要点。",
+          "polishHints": [
+            "数据描述用 climbed from … to …, peaked at …, plummeted to … 替换 went up / down",
+            "提炼一句 thesis：'These shifts mirror a broader transition from …'",
+            "避免 'In conclusion, the chart shows...' 这种空话"
+          ],
+          "tags": ["chart", "data-description", "cet6"]
+        }
+      ]
+    },
+    {
+      "id": "cet-translation",
+      "label": "四六级翻译",
+      "description": "段落汉译英（约 140-180 字）评估模板",
+      "templates": [
+        {
+          "id": "cet-translation-cet4-paragraph",
+          "title": "CET-4 段落汉译英 · 文化类",
+          "summary": "评估文化主题段落翻译的准确性与通顺度",
+          "evaluationFocus": ["准确", "通顺", "文化负载词", "语法"],
+          "scoreWeights": { "accuracy": 35, "fluency": 25, "cultural_terms": 20, "grammar": 20 },
+          "directionsTemplate": "请将下面的段落翻译成英文：春节是中国最重要的传统节日，象征着团圆与新生。家家户户会贴春联、放鞭炮、吃年夜饭，并以红包传递祝福。如今，越来越多的外国朋友也开始体验春节的喜庆氛围。",
+          "rubric": "亮点：'春节'用 Spring Festival 或 the Chinese New Year，'年夜饭'用 reunion dinner，'红包'用 red envelopes，时态切换得当（描述习俗用一般现在时）。扣分点：直译 'red bag'、用 happy 修饰 atmosphere（应用 festive）、漏译 '团圆与新生' 之一。",
+          "polishHints": [
+            "文化负载词使用约定俗成的英文表达，再用同位语解释一次",
+            "用 not only … but also 把多个习俗串成一句更地道",
+            "'传递祝福' 用 convey best wishes 替代 give wishes"
+          ],
+          "tags": ["translation", "cultural", "cet4"]
+        },
+        {
+          "id": "cet-translation-cet6-paragraph",
+          "title": "CET-6 段落汉译英 · 社会发展",
+          "summary": "评估社会发展类段落翻译的准确性与表达多样性",
+          "evaluationFocus": ["准确", "句式多样", "术语规范", "连贯"],
+          "scoreWeights": { "accuracy": 30, "syntax_variety": 25, "terminology": 25, "coherence": 20 },
+          "directionsTemplate": "请将下面的段落翻译成英文：脱贫攻坚是中国实现共同富裕的关键一战。过去十年里，中国累计使近一亿农村贫困人口摆脱了绝对贫困，被联合国誉为人类发展史上的奇迹。这一成就既得益于精准扶贫政策，也离不开亿万一线干部的坚守。",
+          "rubric": "亮点：'脱贫攻坚'用 poverty alleviation campaign / battle，'共同富裕'用 common prosperity，'精准扶贫'用 targeted poverty alleviation，能用 lifted … out of absolute poverty 这种地道搭配。扣分点：术语翻译不规范、句子全用并列句、'坚守' 漏译或误译为 'persistence' 不达意（应为 dedication / steadfast efforts）。",
+          "polishHints": [
+            "用被动语态自然嵌入数据：'nearly 100 million rural residents have been lifted out of absolute poverty'",
+            "'被誉为' 用 has been hailed as 而非 is called",
+            "末句用非谓语：'a feat owed to … and made possible by …'"
+          ],
+          "tags": ["translation", "social", "cet6"]
+        }
+      ]
+    },
+    {
+      "id": "kaoyan-writing",
+      "label": "考研写作",
+      "description": "考研英语一/二 大小作文评估模板",
+      "templates": [
+        {
+          "id": "kaoyan-writing-en1-small-notice",
+          "title": "考研英语一 · 小作文（通知，10 分）",
+          "summary": "评估格式规范、信息要点齐全的英文通知",
+          "evaluationFocus": ["格式", "要点完整", "得体", "语法"],
+          "scoreWeights": { "format": 25, "completeness": 35, "appropriateness": 20, "grammar": 20 },
+          "directionsTemplate": "Suppose you are the chair of your university's Student Union. Write a notice of about 100 words to recruit volunteers for an international cultural festival. Include: (1) the event background; (2) the qualifications expected; (3) how to sign up.",
+          "rubric": "亮点：标题居中 NOTICE 大写、署名 Student Union、三要点（背景 / 资格 / 报名方式）齐全且各占一句以上、语气正式。扣分点：标题写成日期、缺署名、把 'sign up' 写成口语化的 'leave your name'、要点遗漏一项。",
+          "polishHints": [
+            "开头用 'In order to celebrate...' 一句话引出活动背景",
+            "资格用 bullet 之外的连贯方式：'Applicants are expected to be fluent in English and willing to commit at least 10 hours.'",
+            "结尾给清晰的报名渠道：邮箱 + 截止日期"
+          ],
+          "tags": ["notice", "small-essay", "kaoyan-en1"]
+        },
+        {
+          "id": "kaoyan-writing-en1-big-picture",
+          "title": "考研英语一 · 大作文（图画作文，20 分）",
+          "summary": "评估能从图画提炼主题并展开三段式论证的大作文",
+          "evaluationFocus": ["主题提炼", "论证深度", "句式多样", "高级词汇"],
+          "scoreWeights": { "thesis": 25, "argumentation": 30, "syntax": 25, "vocabulary": 20 },
+          "directionsTemplate": "The picture shows a young person engrossed in a smartphone while a thick book lies untouched on the desk. Write an essay of about 160-200 words: (1) describe the picture; (2) interpret what it implies about contemporary reading habits; (3) suggest your own response.",
+          "rubric": "亮点：图画描述精炼（一句话）、提炼出 'fragmented reading vs. deep reading' 这种概念性主题、第二段用至少两个论据展开、第三段给可执行建议。扣分点：花一整段描述图画细节、主题表面化（'手机不好书很好'）、论据空泛、结尾喊口号。",
+          "polishHints": [
+            "图画描述用现在分词：'In the picture, a youngster is glued to his phone, with a hardcover book lying neglected.'",
+            "用 'paradoxically' 引出反差，'the more … the less ...' 强化对比",
+            "结尾给具体动作：'designate phone-free reading hours' 而非 'we should read more'"
+          ],
+          "tags": ["picture-essay", "big-essay", "kaoyan-en1"]
+        },
+        {
+          "id": "kaoyan-writing-en2-big-chart",
+          "title": "考研英语二 · 大作文（图表作文，15 分）",
+          "summary": "评估能客观描述数据并给出有逻辑解释的图表作文",
+          "evaluationFocus": ["数据描述", "趋势归因", "结构", "语言准确"],
+          "scoreWeights": { "data_description": 30, "interpretation": 25, "structure": 25, "language": 20 },
+          "directionsTemplate": "The chart below shows the top three reasons Chinese postgraduates choose to study abroad in 2014 vs. 2024. Write an essay of 150-200 words: (1) describe the chart; (2) explain the changes; (3) predict a future trend.",
+          "rubric": "亮点：数据复述精准（百分比 / 排序变化）、归因有层次（个人 / 社会 / 政策）、最后预测合理。扣分点：把 2014 和 2024 数据混在一起、只翻译图表数字不归因、预测脱离数据（如直接预测某专业排名）。",
+          "polishHints": [
+            "把数据用对比连词组织：'whereas employment-driven motives dropped from … to …, …'",
+            "归因层次用 'on the individual level / against a broader societal backdrop'",
+            "预测加缓冲语：'this trajectory is likely to persist, provided that …'"
+          ],
+          "tags": ["chart-essay", "big-essay", "kaoyan-en2"]
+        }
+      ]
+    },
+    {
+      "id": "kaoyan-translation",
+      "label": "考研翻译",
+      "description": "考研英语一/二翻译题评估模板",
+      "templates": [
+        {
+          "id": "kaoyan-translation-en1-eng-zh",
+          "title": "考研英语一 · 英译汉（5 分句翻译）",
+          "summary": "评估对学术英语长难句的拆解与汉语表达通顺度",
+          "evaluationFocus": ["理解准确", "句子拆解", "汉语通顺", "术语规范"],
+          "scoreWeights": { "comprehension": 35, "structure_handling": 25, "fluency": 25, "terminology": 15 },
+          "directionsTemplate": "请将下面的句子翻译成中文：It may be said that the measure of the worth of any social institution is its effect in enlarging and improving experience, but this effect is not a part of its original motive.",
+          "rubric": "亮点：能识别主从结构（may be said 引导主句、measure of … 主语、but 转折 / 'this effect' 指代）、长句拆成 2-3 个短句、汉语表达自然不机械。扣分点：保留英文长句结构生硬翻译、不译 'this effect' 导致指代不清、用 '它' '那个' 等模糊代词。",
+          "polishHints": [
+            "把 'It may be said that …' 译为 '可以认为' 而非 '它可以被说'",
+            "'the measure of the worth' 译为 '衡量 … 价值的标准'",
+            "用破折号或冒号承接转折：'但是 —— 这种效用并非其最初的动机所在。'"
+          ],
+          "tags": ["translation", "english-to-chinese", "kaoyan-en1"]
+        },
+        {
+          "id": "kaoyan-translation-en2-zh-eng-paragraph",
+          "title": "考研英语二 · 段落汉译英（15 分）",
+          "summary": "评估段落汉译英的整体连贯性与表达地道度",
+          "evaluationFocus": ["准确", "连贯", "地道表达", "术语"],
+          "scoreWeights": { "accuracy": 30, "coherence": 25, "idiomaticity": 25, "terminology": 20 },
+          "directionsTemplate": "请将下面的段落翻译成英文：随着远程办公的普及，越来越多的年轻人选择在生活成本较低的二三线城市定居。这种趋势既缓解了大城市的人口压力，也为中小城市带来了新的活力。然而，公共服务和职业发展机会的不均衡，仍是不容忽视的挑战。",
+          "rubric": "亮点：'远程办公' 用 remote work，'二三线城市' 用 second- and third-tier cities，连接词使用得当（with the rise of … / however / not to be overlooked）、句间逻辑清晰。扣分点：'生活成本' 译为 'live cost'、'活力' 译为 'energy'（应为 vitality / vibrancy）、最后转折直接用 'but' 显得生硬。",
+          "polishHints": [
+            "首句用 with 引导：'With remote work becoming widespread, an increasing number of young people are settling in...'",
+            "'缓解 ... 也带来 ...' 用 not only ease … but also breathe new life into …",
+            "末句用 nonetheless / that said 替换 but，更书面"
+          ],
+          "tags": ["translation", "chinese-to-english", "kaoyan-en2"]
+        }
+      ]
+    },
+    {
+      "id": "njnu-context",
+      "label": "南师大场景化",
+      "description": "结合南师大文化与教师课堂任务的校本化评估模板",
+      "templates": [
+        {
+          "id": "njnu-classroom-motto-reflection",
+          "title": "张老师课堂任务 · 校训反思短文",
+          "summary": "围绕南师大校训『正德厚生 · 笃学敏行』撰写英文反思短文",
+          "evaluationFocus": ["切题", "校训理解", "结构", "情感真挚"],
+          "scoreWeights": { "relevance": 30, "motto_interpretation": 25, "structure": 25, "authenticity": 20 },
+          "directionsTemplate": "Write a short essay of about 150 words reflecting on the NJNU motto 正德厚生 · 笃学敏行 (Cultivate Virtue and Nurture Lives · Pursue Learning and Act Diligently). Explain how it has shaped one of your choices during your university life, and connect it to a future commitment.",
+          "rubric": "亮点：能用一句英文转译校训精髓（如 'a moral compass that turns scholarship into service'）、给出一个具体的个人故事（支教 / 志愿服务 / 实验室经历）、结尾把校训与未来的职业 / 学术承诺挂钩。扣分点：套用万能模板没有 NJNU 元素、把 motto 译成生硬字面、故事空泛缺细节、结尾喊口号。",
+          "polishHints": [
+            "用一句话给校训一个英文 working translation，避免逐字翻译",
+            "故事段写一两个感官细节（夜里的随园灯、仙林的实验室）增强真实感",
+            "结尾用 'Looking ahead, I will…' 给一个具体可量化的承诺"
+          ],
+          "tags": ["njnu", "motto", "reflection"]
+        },
+        {
+          "id": "njnu-suiyuan-cultural-narrative",
+          "title": "随园校区文化叙事",
+          "summary": "围绕随园校区的人文与建筑写一则文化叙事段落",
+          "evaluationFocus": ["语境契合", "文化负载词", "句式", "感染力"],
+          "scoreWeights": { "context_match": 30, "cultural_terms": 25, "syntax_variety": 25, "voice": 20 },
+          "directionsTemplate": "Write a 150-180 word narrative paragraph for an English campus tour about NJNU's Suiyuan Campus, where the calligraphy stones, century-old wutong trees, and arched stone bridges meet the rhythm of student life. Emphasize the dialogue between heritage and learning.",
+          "rubric": "亮点：能把『随园』译为 Suiyuan Garden 并补一句历史注脚、用 century-old plane trees / inscribed stones / vaulted stone bridges 等具象化描写、句式至少两种以上（含分词或定语从句）、声音温暖有人情味。扣分点：堆砌形容词没有具体形象、把 wutong 误译为 phoenix tree 而无解释、整段都是 simple sentence、结尾突兀。",
+          "polishHints": [
+            "用现在分词开头营造画面感：'Walking past the inscribed stones of Suiyuan, one hears…'",
+            "把 'old trees' 升级为 'century-old plane trees whose canopies cast lacy shadows'",
+            "结尾把建筑与学习并置：'where every footpath becomes a silent lecture.'"
+          ],
+          "tags": ["njnu", "suiyuan", "narrative"]
+        }
+      ]
+    }
+  ]
+}
