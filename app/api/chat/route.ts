@@ -11,9 +11,9 @@ const ChatRequestSchema = z.object({
   messages: z.array(ChatMessageSchema).min(1).max(20),
   evaluationContext: z
     .object({
-      directions: z.string().max(500).optional(),
-      essayContext: z.string().max(2000).optional(),
-      studentSentence: z.string().max(1000).optional(),
+      directions: z.string().max(1000).optional(),
+      essayContext: z.string().max(8000).optional(),
+      studentSentence: z.string().max(8000).optional(),
       result: z
         .object({
           score: z.string().optional(),
@@ -146,11 +146,16 @@ export async function POST(request: NextRequest) {
 
     const data = (await upstream.json()) as { choices?: DeepSeekChoice[] };
     const msg = data.choices?.[0]?.message;
-    // 思考模式 max 时主要内容可能落在 reasoning_content，content 为空
-    const reply = (msg?.content?.trim() || msg?.reasoning_content?.trim() || "").trim();
+    // 只把 content 当作给用户的回复。reasoning_content 是模型的内部链式思考，
+    // 不应该泄漏给最终用户（即使 max 模式偶尔 content 为空也宁愿让用户重试）。
+    const reply = msg?.content?.trim() ?? "";
     if (!reply) {
       return NextResponse.json(
-        { error: "EMPTY_REPLY", message: "AI 没有返回内容，请重试", retryable: true },
+        {
+          error: "EMPTY_REPLY",
+          message: "AI 没有返回内容，请重试或将思考强度从 max 调到 high",
+          retryable: true,
+        },
         { status: 502 },
       );
     }

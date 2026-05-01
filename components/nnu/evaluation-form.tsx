@@ -11,6 +11,7 @@ import { debounce } from "@/lib/performance";
 import { evaluationRateLimiter } from "@/lib/rate-limiter";
 import { isUsingCustomAPI } from "@/lib/settings";
 import { ArrowsClockwise, PaperPlaneRight, FileText, Cloud, Key, Shuffle, MagnifyingGlass } from "@phosphor-icons/react";
+import { FileUploadButton } from "./file-upload-button";
 import sampleCasesData from "@/data/sample-cases.json";
 
 export interface EvaluationFormProps {
@@ -95,6 +96,19 @@ export function EvaluationForm({
       saveDraft(formData);
     }
   }, [formData, saveDraft]);
+
+  // Re-seed from initialData when parent changes it (e.g., user picks a
+  // template from PromptLibraryPanel after the form is already mounted).
+  // We compare on the directions string to avoid loops.
+  const lastSeededDirectionsRef = React.useRef<string | undefined>(undefined);
+  React.useEffect(() => {
+    const incoming = initialData?.directions;
+    if (incoming && incoming !== lastSeededDirectionsRef.current) {
+      lastSeededDirectionsRef.current = incoming;
+      setFormData((prev) => ({ ...prev, directions: incoming }));
+      setErrors([]);
+    }
+  }, [initialData?.directions]);
 
   const validateField = (field: keyof EvaluationInput, value: string): string | null => {
     // Skip validation for optional evaluationType field
@@ -333,6 +347,17 @@ export function EvaluationForm({
           Essay Full Text (文章全文)
           <span className="text-xs font-normal text-gray-400 ml-auto">选中句子后点击下方按钮评估</span>
         </label>
+        <div className="-mt-1 mb-1 p-3 rounded-lg liquid-glass-tinted border border-nnu-green/15">
+          <p className="text-xs text-gray-600 mb-2">
+            支持拍照手写稿、Word、PDF —— MinerU 自动识别成文字填入下方
+          </p>
+          <FileUploadButton
+            onExtracted={(text) => {
+              setFormData((prev) => ({ ...prev, essayContext: text }));
+              setTouched((prev) => ({ ...prev, essayContext: true }));
+            }}
+          />
+        </div>
         <Textarea
           ref={essayContextRef}
           id="essayContext"

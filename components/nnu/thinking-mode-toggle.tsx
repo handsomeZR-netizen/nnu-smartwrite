@@ -27,10 +27,20 @@ export const ThinkingModeToggle: React.FC<ThinkingModeToggleProps> = ({
   const [effort, setEffort] = React.useState<ReasoningEffort>("high");
 
   React.useEffect(() => {
-    const s = getSettings();
-    setThinking(s.reasoning.thinking);
-    setEffort(s.reasoning.effort);
+    const sync = () => {
+      const s = getSettings();
+      setThinking(s.reasoning.thinking);
+      setEffort(s.reasoning.effort);
+    };
+    sync();
     setMounted(true);
+    // Stay in sync with external changes (settings page reset, other tabs)
+    window.addEventListener("nnu-settings-change", sync);
+    window.addEventListener("storage", sync);
+    return () => {
+      window.removeEventListener("nnu-settings-change", sync);
+      window.removeEventListener("storage", sync);
+    };
   }, []);
 
   const persist = (next: { thinking: ThinkingMode; effort: ReasoningEffort }) => {

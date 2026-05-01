@@ -9,7 +9,14 @@ export interface FooterProps extends React.HTMLAttributes<HTMLElement> {}
 
 export const Footer = React.forwardRef<HTMLElement, FooterProps>(
   ({ className, ...props }, ref) => {
-    const currentYear = new Date().getFullYear();
+    // Hydrate year on the client only. Reading new Date() during render in
+    // a Client Component triggers next-prerender-current-time-client in
+    // Next.js 16. We render a stable placeholder on the server and update
+    // after mount.
+    const [currentYear, setCurrentYear] = React.useState<number | null>(null);
+    React.useEffect(() => {
+      setCurrentYear(new Date().getFullYear());
+    }, []);
 
     return (
       <footer
@@ -93,7 +100,8 @@ export const Footer = React.forwardRef<HTMLElement, FooterProps>(
 
           {/* Copyright */}
           <p className="text-xs text-white/50 mb-2">
-            &copy; {currentYear} 南京师范大学 SmartWrite 项目团队
+            &copy; <span suppressHydrationWarning>{currentYear ?? ""}</span>{" "}
+            南京师范大学 SmartWrite 项目团队
           </p>
           <p className="text-xs text-white/40">
             版权所有 · 保留所有权利

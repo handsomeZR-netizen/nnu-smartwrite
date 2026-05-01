@@ -78,6 +78,9 @@ export function saveSettings(settings: AppSettings): boolean {
     };
     
     localStorage.setItem(SETTINGS_KEY, JSON.stringify(toSave));
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('nnu-settings-change'));
+    }
     return true;
   } catch (error) {
     console.error('Failed to save settings:', error);
@@ -95,6 +98,9 @@ export function resetSettings(): boolean {
     }
     
     localStorage.removeItem(SETTINGS_KEY);
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('nnu-settings-change'));
+    }
     return true;
   } catch (error) {
     console.error('Failed to reset settings:', error);
