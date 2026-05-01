@@ -8,7 +8,9 @@ import { Button } from "@/components/ui/button";
 import type { EvaluationInput, EvaluationResult, APIError } from "@/lib/types";
 import { saveToHistory } from "@/lib/storage";
 import { ResultCardSkeleton } from "@/components/nnu/skeletons";
-import { Activity, GraduationCap, AlertTriangle, RotateCcw, ArrowLeft, Trash2 } from "lucide-react";
+import { Activity, GraduationCap, AlertTriangle, RotateCcw, ArrowLeft, Trash2, Printer } from "lucide-react";
+import { FollowUpChat } from "@/components/nnu/followup-chat";
+import { ThinkingModeToggle } from "@/components/nnu/thinking-mode-toggle";
 
 const ResultCard = dynamic(
   () => import("@/components/nnu/result-card").then(mod => mod.ResultCard),
@@ -53,6 +55,7 @@ export default function EvaluatePage() {
         customAPIEndpoint: settings.api.customAPIEndpoint,
         customAPIModel: settings.api.customAPIModel,
       } : {}),
+      ...(settings?.reasoning ? { reasoning: settings.reasoning } : {}),
     };
     
     const response = await fetch('/api/evaluate', {
@@ -160,8 +163,17 @@ export default function EvaluatePage() {
   return (
     <div className="min-h-screen bg-nnu-paper pt-24 pb-8 px-4">
       <div className="container mx-auto max-w-7xl">
+        {/* iOS 26 Liquid Glass thinking-mode control bar */}
+        <div className="mb-5 flex items-center justify-between flex-wrap gap-3 print:hidden">
+          <div className="flex items-center gap-2 text-xs text-gray-500">
+            <span className="w-2 h-2 rounded-full bg-nnu-green/70 shadow-[0_0_0_4px_rgba(31,106,82,0.12)]" />
+            <span>当前模型 deepseek-v4-flash · 思考模式可调</span>
+          </div>
+          <ThinkingModeToggle />
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          
+
           {/* 左侧：输入区 */}
           <div className="lg:col-span-7 space-y-6">
             <Card className="bg-white rounded-xl shadow-xl border-t-4 border-nnu-green">
@@ -230,14 +242,26 @@ export default function EvaluatePage() {
             )}
 
             {/* 结果展示 */}
-            {result && (
+            {result && currentInput && (
               <div className="space-y-4">
-                <ResultCard result={result} showRadarChart={!!(result.radarScores || result.radarDimensions)} />
-                
-                {/* 清空按钮 */}
-                <div className="flex justify-center">
-                  <Button 
-                    onClick={handleReset} 
+                <div id="evaluation-printable">
+                  <ResultCard result={result} showRadarChart={!!(result.radarScores || result.radarDimensions)} />
+                </div>
+
+                <FollowUpChat input={currentInput} result={result} />
+
+                {/* 操作按钮 */}
+                <div className="flex flex-wrap gap-3 justify-center print:hidden">
+                  <Button
+                    onClick={() => typeof window !== "undefined" && window.print()}
+                    variant="outline"
+                    className="text-nnu-green border-nnu-green hover:bg-nnu-green/10"
+                  >
+                    <Printer className="w-4 h-4 mr-2" />
+                    导出报告 (PDF)
+                  </Button>
+                  <Button
+                    onClick={handleReset}
                     variant="outline"
                     className="text-gray-600 hover:text-red-600 hover:border-red-300"
                   >

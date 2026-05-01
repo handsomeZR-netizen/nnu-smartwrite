@@ -3,6 +3,9 @@
  * 处理API配置和示例案例的本地存储
  */
 
+export type ThinkingMode = 'enabled' | 'disabled';
+export type ReasoningEffort = 'high' | 'max';
+
 export interface APISettings {
   useCustomAPI: boolean;
   customAPIKey?: string;
@@ -10,8 +13,14 @@ export interface APISettings {
   customAPIModel?: string;
 }
 
+export interface ReasoningSettings {
+  thinking: ThinkingMode;
+  effort: ReasoningEffort;
+}
+
 export interface AppSettings {
   api: APISettings;
+  reasoning: ReasoningSettings;
   lastUpdated: number;
 }
 
@@ -19,6 +28,10 @@ const SETTINGS_KEY = 'nnu-smartwrite-settings';
 const DEFAULT_SETTINGS: AppSettings = {
   api: {
     useCustomAPI: false,
+  },
+  reasoning: {
+    thinking: 'enabled',
+    effort: 'high',
   },
   lastUpdated: Date.now(),
 };
@@ -38,7 +51,12 @@ export function getSettings(): AppSettings {
     }
     
     const parsed = JSON.parse(stored);
-    return { ...DEFAULT_SETTINGS, ...parsed };
+    return {
+      ...DEFAULT_SETTINGS,
+      ...parsed,
+      api: { ...DEFAULT_SETTINGS.api, ...(parsed?.api ?? {}) },
+      reasoning: { ...DEFAULT_SETTINGS.reasoning, ...(parsed?.reasoning ?? {}) },
+    };
   } catch (error) {
     console.error('Failed to load settings:', error);
     return DEFAULT_SETTINGS;

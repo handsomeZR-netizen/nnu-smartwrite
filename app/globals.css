@@ -354,3 +354,29 @@ body {
   animation: slideDown 0.6s ease-out 0.4s forwards;
   opacity: 0;
 }
+
+/* Print styles for PDF export of evaluation reports */
+@media print {
+  nav,
+  footer,
+  .print\:hidden {
+    display: none !important;
+  }
+  body {
+    background: white !important;
+    color: #111 !important;
+  }
+  main {
+    padding: 0 !important;
+  }
+  #evaluation-printable {
+    box-shadow: none !important;
+    page-break-inside: avoid;
+  }
+  #evaluation-printable * {
+    color: #111 !important;
+  }
+  @page {
+    margin: 16mm 14mm;
+  }
+}
