@@ -5,3 +5,4 @@ export { Footer, type FooterProps } from "./footer";
 export { EvaluationForm, type EvaluationFormProps } from "./evaluation-form";
 export { ResultCard, type ResultCardProps } from "./result-card";
 export { RadarChart, type RadarChartProps } from "./radar-chart";
+export { AnnotatedEssay, type AnnotatedEssayProps } from "./annotated-essay";

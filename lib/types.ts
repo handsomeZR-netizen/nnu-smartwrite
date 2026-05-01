@@ -52,9 +52,6 @@ export interface RadarDimensions {
   labels: [string, string, string, string]; // 维度标签
 }
 
-/**
- * 句子级 issue 类型枚举
- */
 export type IssueType = 'grammar' | 'spelling' | 'vocab' | 'style' | 'logic';
 
 /**
@@ -84,10 +81,12 @@ export interface SentenceAnnotation {
  */
 export interface EvaluationResult {
   score: 'S' | 'A' | 'B' | 'C';           // 等级评分
+  numericScore?: number;                  // 可选：百分制总分 (0-100)
   isSemanticallyCorrect: boolean;         // 语义正确性标志
   analysis: string;                       // 详细分析文本（向后兼容）
   analysisBreakdown?: AnalysisBreakdown;  // 结构化分析（新增）
   polishedVersion: string;                // 润色建议
+  sentenceAnnotations?: SentenceAnnotation[]; // 可选：逐句批注 + 错误标红
   radarScores?: {                         // 可选：雷达图数据（传统格式）
     vocabulary: number;    // 词汇 (0-100)
     grammar: number;       // 语法 (0-100)
@@ -97,8 +96,6 @@ export interface EvaluationResult {
   radarDimensions?: RadarDimensions;      // 可选：动态雷达图维度（新增）
   evaluationType?: EvaluationType;        // 评估类型
   reasoningProcess?: string;              // 推理过程（来自deepseek-reasoner）
-  numericScore?: number;                  // 可选：百分制总分 (0-100)，用于量化打分
-  sentenceAnnotations?: SentenceAnnotation[]; // 可选：逐句批注 + 错误标红信息
   timestamp: number;                      // 评估时间戳
 }
 

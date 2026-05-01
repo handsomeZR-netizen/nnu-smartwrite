@@ -4,7 +4,8 @@ import { Badge } from '@/components/ui/badge';
 import type { EvaluationResult } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { RadarChart } from './radar-chart';
-import { ChartBar, CheckCircle, BookOpen, WarningCircle, CaretRight, Lightbulb, XCircle, Brain } from '@phosphor-icons/react';
+import { AnnotatedEssay } from './annotated-essay';
+import { ChartBar, CheckCircle, BookOpen, WarningCircle, CaretRight, Lightbulb, XCircle, Brain, MapPin } from '@phosphor-icons/react';
 
 export interface ResultCardProps {
   result: EvaluationResult;
@@ -36,17 +37,96 @@ const getScoreDescription = (score: 'S' | 'A' | 'B' | 'C'): string => {
   return descriptions[score];
 };
 
+const NUMERIC_RING_SIZE = 96;
+const NUMERIC_RING_STROKE = 8;
+const NUMERIC_RING_RADIUS = (NUMERIC_RING_SIZE - NUMERIC_RING_STROKE) / 2;
+const NUMERIC_RING_CIRCUMFERENCE = 2 * Math.PI * NUMERIC_RING_RADIUS;
+
+const getNumericRingColor = (value: number | null): { stroke: string; text: string } => {
+  if (value === null) {
+    return { stroke: '#d1d5db', text: 'text-gray-400' };
+  }
+  if (value >= 80) {
+    return { stroke: '#16a34a', text: 'text-green-600' };
+  }
+  if (value >= 60) {
+    return { stroke: '#d97706', text: 'text-amber-600' };
+  }
+  return { stroke: '#dc2626', text: 'text-red-600' };
+};
+
+interface NumericScoreRingProps {
+  numericScore?: number;
+}
+
+const NumericScoreRing: React.FC<NumericScoreRingProps> = ({ numericScore }) => {
+  const hasScore =
+    typeof numericScore === 'number' && Number.isFinite(numericScore);
+  const clamped = hasScore ? Math.max(0, Math.min(100, numericScore as number)) : null;
+  const colors = getNumericRingColor(clamped);
+  const dashOffset =
+    clamped === null
+      ? NUMERIC_RING_CIRCUMFERENCE
+      : NUMERIC_RING_CIRCUMFERENCE * (1 - clamped / 100);
+
+  return (
+    <div className="text-center" aria-label={hasScore ? `具体分数 ${clamped}/100` : '具体分数暂未提供'}>
+      <div className="text-sm text-gray-500 mb-1">具体分数</div>
+      <div className="relative inline-flex items-center justify-center" style={{ width: NUMERIC_RING_SIZE, height: NUMERIC_RING_SIZE }}>
+        <svg
+          width={NUMERIC_RING_SIZE}
+          height={NUMERIC_RING_SIZE}
+          viewBox={`0 0 ${NUMERIC_RING_SIZE} ${NUMERIC_RING_SIZE}`}
+          className="-rotate-90"
+          aria-hidden="true"
+        >
+          <circle
+            cx={NUMERIC_RING_SIZE / 2}
+            cy={NUMERIC_RING_SIZE / 2}
+            r={NUMERIC_RING_RADIUS}
+            fill="none"
+            stroke="#e5e7eb"
+            strokeWidth={NUMERIC_RING_STROKE}
+          />
+          <circle
+            cx={NUMERIC_RING_SIZE / 2}
+            cy={NUMERIC_RING_SIZE / 2}
+            r={NUMERIC_RING_RADIUS}
+            fill="none"
+            stroke={colors.stroke}
+            strokeWidth={NUMERIC_RING_STROKE}
+            strokeLinecap="round"
+            strokeDasharray={NUMERIC_RING_CIRCUMFERENCE}
+            strokeDashoffset={dashOffset}
+            style={{ transition: 'stroke-dashoffset 600ms ease-out' }}
+          />
+        </svg>
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <span className={cn('text-3xl font-black leading-none', colors.text)}>
+            {clamped !== null ? clamped : '—'}
+          </span>
+          <span className="text-[10px] text-gray-400 mt-1 tracking-wider">/100</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 
 export const ResultCard: React.FC<ResultCardProps> = ({ result, showRadarChart = false }) => {
-  const { 
-    score, 
-    isSemanticallyCorrect, 
-    analysis, 
+  const {
+    score,
+    numericScore,
+    isSemanticallyCorrect,
+    analysis,
     analysisBreakdown,
     polishedVersion,
+    sentenceAnnotations,
     evaluationType,
-    reasoningProcess 
+    reasoningProcess
   } = result;
+
+  const hasSentenceAnnotations = Array.isArray(sentenceAnnotations) && sentenceAnnotations.length > 0;
 
   const [selectedDimension, setSelectedDimension] = useState<string | null>(null);
   const [showReasoning, setShowReasoning] = useState(false);
@@ -139,10 +219,10 @@ export const ResultCard: React.FC<ResultCardProps> = ({ result, showRadarChart =
 
       <CardContent className="p-6">
         {/* Score and Radar */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between flex-wrap gap-y-4 mb-6">
           <div className="text-center">
             <div className="text-sm text-gray-500 mb-1">综合评级</div>
-            <div 
+            <div
               className={cn("text-6xl font-black font-serif drop-shadow-sm", getScoreColor(score))}
               role="status"
               aria-label={`评分等级 ${score}，${getScoreDescription(score)}`}
@@ -155,12 +235,16 @@ export const ResultCard: React.FC<ResultCardProps> = ({ result, showRadarChart =
               </Badge>
             )}
           </div>
-          
+
+          <div className="h-12 w-[1px] bg-gray-200 hidden sm:block" />
+
+          <NumericScoreRing numericScore={numericScore} />
+
           {showRadarChart && (result.radarDimensions || result.radarScores) && (
             <>
-              <div className="h-12 w-[1px] bg-gray-200" />
+              <div className="h-12 w-[1px] bg-gray-200 hidden sm:block" />
               <div className="w-48 h-32">
-                <RadarChart 
+                <RadarChart
                   scores={result.radarScores}
                   dimensions={result.radarDimensions}
                   size="sm"
@@ -254,6 +338,25 @@ export const ResultCard: React.FC<ResultCardProps> = ({ result, showRadarChart =
             </div>
           ))}
         </div>
+
+        {/* 逐句批注（折叠） */}
+        {hasSentenceAnnotations && (
+          <details className="mt-6 group rounded-lg border border-gray-200 bg-white/60 backdrop-blur-sm overflow-hidden">
+            <summary className="flex items-center justify-between gap-2 cursor-pointer list-none px-4 py-3 text-sm font-semibold text-nnu-green hover:bg-nnu-green/5 transition-colors">
+              <span className="flex items-center gap-2">
+                <MapPin className="w-4 h-4" weight="fill" />
+                逐句批注
+                <span className="text-xs font-normal text-gray-500">
+                  共 {sentenceAnnotations?.length} 句
+                </span>
+              </span>
+              <CaretRight className="w-4 h-4 transition-transform group-open:rotate-90 text-gray-400" />
+            </summary>
+            <div className="px-4 pb-4 pt-2 border-t border-gray-100 bg-gray-50/40">
+              <AnnotatedEssay sentenceAnnotations={sentenceAnnotations ?? []} />
+            </div>
+          </details>
+        )}
 
         {/* Footer */}
         <div className="mt-6 pt-4 border-t border-gray-100 flex justify-between items-center">
