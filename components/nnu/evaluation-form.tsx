@@ -10,7 +10,7 @@ import { ZodError } from "zod";
 import { debounce } from "@/lib/performance";
 import { evaluationRateLimiter } from "@/lib/rate-limiter";
 import { isUsingCustomAPI } from "@/lib/settings";
-import { RefreshCw, Send, FileText, Cloud, Key, Shuffle, ScanSearch } from "lucide-react";
+import { ArrowsClockwise, PaperPlaneRight, FileText, Cloud, Key, Shuffle, MagnifyingGlass } from "@phosphor-icons/react";
 import sampleCasesData from "@/data/sample-cases.json";
 
 export interface EvaluationFormProps {
@@ -287,7 +287,7 @@ export function EvaluationForm({
             onClick={handleFillSample}
             className="text-xs text-nnu-green hover:text-nnu-coral underline flex items-center gap-1 transition-colors whitespace-nowrap"
           >
-            <RefreshCw className="w-3 h-3" />
+            <ArrowsClockwise className="w-3 h-3" />
             填入示例
           </button>
         </div>
@@ -421,12 +421,12 @@ export function EvaluationForm({
         >
           {isLoading ? (
             <>
-              <RefreshCw className="w-5 h-5 animate-spin" />
+              <ArrowsClockwise className="w-5 h-5 animate-spin" />
               <span>AI 分析中...</span>
             </>
           ) : (
             <>
-              <ScanSearch className="w-5 h-5" />
+              <MagnifyingGlass className="w-5 h-5" />
               深度分析选中长难句
             </>
           )}

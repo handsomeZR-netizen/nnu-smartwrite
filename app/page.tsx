@@ -2,7 +2,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
-import { Target, BarChart3, BookOpen, Sparkles, BrainCircuit, ScanSearch, ChartBar, ListChecks } from "lucide-react";
+import { Target, ChartBar, BookOpen, Sparkle, Brain, MagnifyingGlass, ChartLineUp, ListChecks } from "@phosphor-icons/react";
 import { MagneticButton } from "@/components/nnu/magnetic-button";
 import { Typewriter } from "@/components/nnu/typewriter";
 
@@ -19,7 +19,7 @@ export default function Home() {
         <div className="container mx-auto relative z-10 text-center max-w-4xl">
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm mb-8 bg-white/10 backdrop-blur-sm border border-white/20">
-            <Sparkles className="w-4 h-4 text-nnu-gold" />
+            <Sparkle className="w-4 h-4 text-nnu-gold" />
             <span className="text-white/90">Powered by DeepSeek-Reasoner AI</span>
           </div>
 
@@ -93,7 +93,7 @@ export default function Home() {
           >
             <CardContent className="pt-8 pb-8 px-6">
               <div className="icon-wrapper w-14 h-14 bg-nnu-green/10 rounded-xl flex items-center justify-center mb-5">
-                <BarChart3 className="w-7 h-7 text-nnu-green" />
+                <ChartBar className="w-7 h-7 text-nnu-green" />
               </div>
               <h3 className="text-xl font-semibold text-nnu-green mb-3">
                 结构化反馈
@@ -148,7 +148,7 @@ export default function Home() {
             <div className="p-6 rounded-xl border-2 border-nnu-green/20 hover:border-nnu-green/40 transition-all">
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 rounded-lg bg-nnu-green/10 flex items-center justify-center shrink-0">
-                  <BrainCircuit className="w-6 h-6 text-nnu-green" />
+                  <Brain className="w-6 h-6 text-nnu-green" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-nnu-green mb-2">AI 推理过程可视化</h3>
@@ -163,7 +163,7 @@ export default function Home() {
             <div className="p-6 rounded-xl border-2 border-nnu-green/20 hover:border-nnu-green/40 transition-all">
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 rounded-lg bg-nnu-green/10 flex items-center justify-center shrink-0">
-                  <ScanSearch className="w-6 h-6 text-nnu-green" />
+                  <MagnifyingGlass className="w-6 h-6 text-nnu-green" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-nnu-green mb-2">智能任务识别</h3>
@@ -178,7 +178,7 @@ export default function Home() {
             <div className="p-6 rounded-xl border-2 border-nnu-green/20 hover:border-nnu-green/40 transition-all">
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 rounded-lg bg-nnu-green/10 flex items-center justify-center shrink-0">
-                  <ChartBar className="w-6 h-6 text-nnu-green" />
+                  <ChartLineUp className="w-6 h-6 text-nnu-green" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-nnu-green mb-2">动态雷达图维度</h3>

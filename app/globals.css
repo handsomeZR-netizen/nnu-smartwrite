@@ -355,6 +355,35 @@ body {
   opacity: 0;
 }
 
+/* iOS 26 Liquid Glass utility classes */
+.liquid-glass {
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow:
+    0 8px 32px -8px rgba(31, 106, 82, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+.liquid-glass-dark {
+  background: linear-gradient(135deg, rgba(31, 106, 82, 0.92), rgba(31, 106, 82, 0.78));
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow:
+    0 12px 40px -12px rgba(31, 106, 82, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+.liquid-glass-tinted {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.7), rgba(244, 184, 96, 0.08));
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow:
+    0 10px 36px -10px rgba(31, 106, 82, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
 /* Print styles for PDF export of evaluation reports */
 @media print {
   nav,

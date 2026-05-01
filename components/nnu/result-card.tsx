@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import type { EvaluationResult } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { RadarChart } from './radar-chart';
-import { BarChart3, CheckCircle, BookOpen, AlertCircle, ChevronRight, Lightbulb, XCircle, Brain } from 'lucide-react';
+import { ChartBar, CheckCircle, BookOpen, WarningCircle, CaretRight, Lightbulb, XCircle, Brain } from '@phosphor-icons/react';
 
 export interface ResultCardProps {
   result: EvaluationResult;
@@ -95,7 +95,7 @@ export const ResultCard: React.FC<ResultCardProps> = ({ result, showRadarChart =
       title: '语义等价判定',
       icon: isSemanticallyCorrect 
         ? <CheckCircle className="w-5 h-5 text-green-600" />
-        : <AlertCircle className="w-5 h-5 text-yellow-600" />,
+        : <WarningCircle className="w-5 h-5 text-yellow-600" />,
       content: isSemanticallyCorrect 
         ? '你的表达在语义上与标准答案等价，AI 判定为正确。'
         : '你的表达与标准答案存在语义差异，建议参考润色建议进行改进。',
@@ -129,7 +129,7 @@ export const ResultCard: React.FC<ResultCardProps> = ({ result, showRadarChart =
       {/* Header */}
       <CardHeader className="bg-nnu-green p-4 text-white flex flex-row justify-between items-center">
         <h3 className="font-bold flex items-center gap-2">
-          <BarChart3 className="w-5 h-5" />
+          <ChartBar className="w-5 h-5" />
           评测报告
         </h3>
         <span className="text-xs bg-white/20 px-2 py-1 rounded">
@@ -259,7 +259,7 @@ export const ResultCard: React.FC<ResultCardProps> = ({ result, showRadarChart =
         <div className="mt-6 pt-4 border-t border-gray-100 flex justify-between items-center">
           <span className="text-xs text-gray-400">Powered by NNU SmartWrite Engine</span>
           <button type="button" className="text-xs text-nnu-green font-bold hover:underline flex items-center">
-            查看完整报告 <ChevronRight className="w-3 h-3" />
+            查看完整报告 <CaretRight className="w-3 h-3" />
           </button>
         </div>
       </CardContent>

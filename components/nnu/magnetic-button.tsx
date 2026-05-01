@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { cn } from "@/lib/utils";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight } from "@phosphor-icons/react";
 
 export interface MagneticButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
