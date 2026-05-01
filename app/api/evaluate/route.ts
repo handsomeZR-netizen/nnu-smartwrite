@@ -23,9 +23,16 @@ interface DeepSeekMessage {
 interface DeepSeekRequest {
   model: string;
   messages: DeepSeekMessage[];
-  temperature: number;
+  temperature?: number;
   max_tokens: number;
   stream: boolean;
+  reasoning_effort?: 'high' | 'max';
+  thinking?: { type: 'enabled' | 'disabled' };
+}
+
+export interface ReasoningOptions {
+  thinking?: 'enabled' | 'disabled';
+  effort?: 'high' | 'max';
 }
 
 interface DeepSeekResponse {
@@ -237,32 +244,44 @@ async function callDeepSeekAPI(
   customAPIKey?: string,
   customAPIEndpoint?: string,
   customAPIModel?: string,
+  reasoningOpts?: ReasoningOptions,
   retryCount = 0
 ): Promise<{ content: string; reasoningContent?: string }> {
   // 优先使用自定义API，否则使用环境变量
   const apiKey = customAPIKey || process.env.DEEPSEEK_API_KEY;
-  
+
   if (!apiKey) {
     throw new Error('DEEPSEEK_API_KEY is not configured');
   }
 
   // 如果自定义端点已包含完整路径，直接使用；否则添加 /chat/completions
   const baseEndpoint = customAPIEndpoint || 'https://api.deepseek.com/v1';
-  const endpoint = baseEndpoint.includes('/chat/completions') 
-    ? baseEndpoint 
+  const endpoint = baseEndpoint.includes('/chat/completions')
+    ? baseEndpoint
     : `${baseEndpoint}/chat/completions`;
-  
+
   // 默认使用 deepseek-v4-flash 模型
   // 可选模型: deepseek-v4-flash, deepseek-chat, deepseek-coder, deepseek-reasoner
   const model = customAPIModel || 'deepseek-v4-flash';
 
+  // 思考模式：默认启用，强度默认 high
+  const thinkingType = reasoningOpts?.thinking ?? 'enabled';
+  const effort = reasoningOpts?.effort ?? 'high';
+
   const requestBody: DeepSeekRequest = {
     model,
     messages,
-    temperature: 0.1, // 降低到 0.1 让 AI 更严格遵循指令（特别是 polished_version 必须是英文）
-    max_tokens: 2000, // 增加 token 限制以支持推理过程
+    max_tokens: 2000,
     stream: false,
+    thinking: { type: thinkingType },
   };
+  // DeepSeek 约束：thinking=disabled 时不能同时传 reasoning_effort
+  if (thinkingType === 'enabled') {
+    requestBody.reasoning_effort = effort;
+  } else {
+    // 非思考模式保留低温 strict 指令遵循
+    requestBody.temperature = 0.1;
+  }
 
   try {
     const response = await fetch(endpoint, {
@@ -280,13 +299,13 @@ async function callDeepSeekAPI(
       // 处理速率限制错误（429）- 可重试
       if (response.status === 429 && retryCount < 2) {
         await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
-        return callDeepSeekAPI(messages, customAPIKey, customAPIEndpoint, customAPIModel, retryCount + 1);
+        return callDeepSeekAPI(messages, customAPIKey, customAPIEndpoint, customAPIModel, reasoningOpts, retryCount + 1);
       }
       
       // 处理服务器错误（5xx）- 可重试
       if (response.status >= 500 && response.status < 600 && retryCount < 2) {
         await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
-        return callDeepSeekAPI(messages, customAPIKey, customAPIEndpoint, customAPIModel, retryCount + 1);
+        return callDeepSeekAPI(messages, customAPIKey, customAPIEndpoint, customAPIModel, reasoningOpts, retryCount + 1);
       }
       
       throw new Error(`DeepSeek API error: ${response.status} - ${errorText}`);
@@ -436,6 +455,14 @@ export async function POST(request: NextRequest) {
     const customAPIKey = body.customAPIKey as string | undefined;
     const customAPIEndpoint = body.customAPIEndpoint as string | undefined;
     const customAPIModel = body.customAPIModel as string | undefined;
+    const reasoningOpts: ReasoningOptions | undefined =
+      body.reasoning && typeof body.reasoning === 'object'
+        ? {
+            thinking:
+              body.reasoning.thinking === 'disabled' ? 'disabled' : 'enabled',
+            effort: body.reasoning.effort === 'max' ? 'max' : 'high',
+          }
+        : undefined;
     
     // 清理输入（防止XSS和注入攻击）
     const sanitizedBody = {
@@ -500,7 +527,7 @@ export async function POST(request: NextRequest) {
       ];
       
       // 调用DeepSeek API（支持自定义配置，默认使用 deepseek-reasoner）
-      const aiResponse = await callDeepSeekAPI(messages, customAPIKey, customAPIEndpoint, customAPIModel);
+      const aiResponse = await callDeepSeekAPI(messages, customAPIKey, customAPIEndpoint, customAPIModel, reasoningOpts);
       
       // 解析AI响应（包含推理过程）
       parsedResponse = parseAIResponse(

@@ -67,6 +67,7 @@ export const FollowUpChat: React.FC<FollowUpChatProps> = ({ input, result }) => 
               customAPIModel: settings.api.customAPIModel,
             }
           : {};
+      const reasoning = settings?.reasoning ? { reasoning: settings.reasoning } : {};
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -74,6 +75,7 @@ export const FollowUpChat: React.FC<FollowUpChatProps> = ({ input, result }) => 
           messages: next,
           evaluationContext: buildContext(input, result),
           ...customApi,
+          ...reasoning,
         }),
       });
       const data = await response.json();

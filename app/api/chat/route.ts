@@ -26,6 +26,12 @@ const ChatRequestSchema = z.object({
   customAPIKey: z.string().optional(),
   customAPIEndpoint: z.string().optional(),
   customAPIModel: z.string().optional(),
+  reasoning: z
+    .object({
+      thinking: z.enum(["enabled", "disabled"]).optional(),
+      effort: z.enum(["high", "max"]).optional(),
+    })
+    .optional(),
 });
 
 const buildSystemPrompt = (
@@ -99,6 +105,22 @@ export async function POST(request: NextRequest) {
     ...parsed.data.messages.map((m) => ({ role: m.role, content: m.content })),
   ];
 
+  const thinkingType = parsed.data.reasoning?.thinking ?? "enabled";
+  const effort = parsed.data.reasoning?.effort ?? "high";
+  const upstreamBody: Record<string, unknown> = {
+    model,
+    messages,
+    max_tokens: 1200,
+    stream: false,
+    thinking: { type: thinkingType },
+  };
+  // DeepSeek 约束：thinking=disabled 时不能传 reasoning_effort
+  if (thinkingType === "enabled") {
+    upstreamBody.reasoning_effort = effort;
+  } else {
+    upstreamBody.temperature = 0.4;
+  }
+
   try {
     const upstream = await fetch(endpoint, {
       method: "POST",
@@ -106,13 +128,7 @@ export async function POST(request: NextRequest) {
         "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
       },
-      body: JSON.stringify({
-        model,
-        messages,
-        temperature: 0.4,
-        max_tokens: 1200,
-        stream: false,
-      }),
+      body: JSON.stringify(upstreamBody),
     });
 
     if (!upstream.ok) {
@@ -129,7 +145,9 @@ export async function POST(request: NextRequest) {
     }
 
     const data = (await upstream.json()) as { choices?: DeepSeekChoice[] };
-    const reply = data.choices?.[0]?.message?.content?.trim();
+    const msg = data.choices?.[0]?.message;
+    // 思考模式 max 时主要内容可能落在 reasoning_content，content 为空
+    const reply = (msg?.content?.trim() || msg?.reasoning_content?.trim() || "").trim();
     if (!reply) {
       return NextResponse.json(
         { error: "EMPTY_REPLY", message: "AI 没有返回内容，请重试", retryable: true },

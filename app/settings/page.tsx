@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { getSettings, saveSettings, resetSettings, type AppSettings } from "@/lib/settings";
-import { Settings, Cloud, Key, RefreshCw, Save, RotateCcw, CheckCircle, AlertCircle } from "lucide-react";
+import { Settings, Cloud, Key, RefreshCw, Save, RotateCcw, CheckCircle, AlertCircle, Brain } from "lucide-react";
+import { ThinkingModeToggle } from "@/components/nnu/thinking-mode-toggle";
 
 export default function SettingsPage() {
   const [settings, setSettings] = React.useState<AppSettings | null>(null);
@@ -123,6 +124,33 @@ export default function SettingsPage() {
             <span>{saveMessage.text}</span>
           </div>
         )}
+
+        {/* 思考模式（iOS 26 Liquid Glass） */}
+        <Card className="mb-6 shadow-lg border-nnu-green/15">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-nnu-green">
+              <Brain className="w-5 h-5" />
+              思考模式
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-gray-600 mb-4">
+              控制 deepseek-v4-flash 的思考开关与强度。开启后模型会先链式推理，再输出结论；关闭则直接快答。
+            </p>
+            <ThinkingModeToggle
+              onChange={(next) =>
+                setSettings((prev) => (prev ? { ...prev, reasoning: next } : prev))
+              }
+            />
+            <p className="text-xs text-gray-400 mt-3">
+              · 极速：thinking.disabled，温度 0.1，适合短句润色与查词
+              <br />
+              · 深度思考 + high：默认，平衡速度与质量
+              <br />
+              · 深度思考 + max：最深推理，适合写作题与复杂语境
+            </p>
+          </CardContent>
+        </Card>
 
         {/* API配置卡片 */}
         <Card className="mb-6 shadow-lg">
