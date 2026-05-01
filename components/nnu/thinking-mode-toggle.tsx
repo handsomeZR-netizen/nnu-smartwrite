@@ -72,8 +72,8 @@ export const ThinkingModeToggle: React.FC<ThinkingModeToggleProps> = ({
     <div
       className={cn(
         "relative isolate inline-flex flex-wrap items-center gap-2 px-1.5 py-1.5 rounded-2xl",
-        "bg-stone-100/55 backdrop-blur-2xl",
-        "border border-stone-200/50",
+        "bg-stone-100/85 backdrop-blur-2xl",
+        "border border-stone-200/70",
         "shadow-[0_2px_10px_-4px_rgba(15,23,42,0.06)]",
         className,
       )}
@@ -161,8 +161,8 @@ const Segmented: React.FC<{
       aria-label={ariaLabel}
       aria-disabled={disabled}
       className={cn(
-        "relative inline-flex items-center p-0.5 rounded-xl",
-        "bg-stone-200/40",
+        "relative inline-flex items-center p-0.5 rounded-xl overflow-hidden",
+        "bg-stone-200/70",
         disabled && "opacity-50 pointer-events-none",
       )}
     >

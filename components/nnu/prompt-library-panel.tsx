@@ -94,10 +94,10 @@ export const PromptLibraryPanel: React.FC<PromptLibraryPanelProps> = ({
         aria-modal={open ? true : undefined}
         aria-hidden={!open}
         aria-label="提示词库"
-        inert={!open}
+        {...(open ? {} : { inert: true })}
       >
-        <div className="liquid-glass h-full flex flex-col rounded-r-2xl shadow-2xl">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-white/30">
+        <div className="h-full flex flex-col rounded-r-2xl shadow-2xl bg-white/95 backdrop-blur-2xl border-r border-nnu-mist/60">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-nnu-mist/70">
             <div className="flex items-center gap-2">
               <BookmarkSimple className="w-5 h-5 text-nnu-green" weight="fill" />
               <h2 className="font-bold text-nnu-green">提示词库</h2>
@@ -109,9 +109,9 @@ export const PromptLibraryPanel: React.FC<PromptLibraryPanelProps> = ({
               type="button"
               aria-label="关闭"
               onClick={() => setOpen(false)}
-              className="p-1.5 rounded-md hover:bg-black/5 text-gray-500 hover:text-nnu-green"
+              className="w-9 h-9 inline-flex items-center justify-center rounded-full bg-nnu-mist/60 hover:bg-nnu-green hover:text-white text-nnu-ink/70 transition-colors"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" weight="bold" />
             </button>
           </div>
 
