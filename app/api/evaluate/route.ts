@@ -252,9 +252,9 @@ async function callDeepSeekAPI(
     ? baseEndpoint 
     : `${baseEndpoint}/chat/completions`;
   
-  // 默认使用 deepseek-chat 模型（稳定版本）
-  // 可选模型: deepseek-chat, deepseek-coder, deepseek-reasoner
-  const model = customAPIModel || 'deepseek-chat';
+  // 默认使用 deepseek-v4-flash 模型
+  // 可选模型: deepseek-v4-flash, deepseek-chat, deepseek-coder, deepseek-reasoner
+  const model = customAPIModel || 'deepseek-v4-flash';
 
   const requestBody: DeepSeekRequest = {
     model,

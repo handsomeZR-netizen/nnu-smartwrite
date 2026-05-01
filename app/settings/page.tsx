@@ -227,13 +227,13 @@ export default function SettingsPage() {
                   <Input
                     id="apiModel"
                     type="text"
-                    placeholder="deepseek-chat"
+                    placeholder="deepseek-v4-flash"
                     value={settings.api.customAPIModel || ''}
                     onChange={(e) => handleCustomAPIChange('customAPIModel', e.target.value)}
                     className="font-mono text-sm"
                   />
                   <p className="text-xs text-gray-500">
-                    留空使用默认模型 deepseek-chat
+                    留空使用默认模型 deepseek-v4-flash
                   </p>
                 </div>
 

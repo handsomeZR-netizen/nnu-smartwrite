@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
   const endpoint = baseEndpoint.includes("/chat/completions")
     ? baseEndpoint
     : `${baseEndpoint}/chat/completions`;
-  const model = parsed.data.customAPIModel || "deepseek-chat";
+  const model = parsed.data.customAPIModel || "deepseek-v4-flash";
 
   const systemPrompt = buildSystemPrompt(parsed.data.evaluationContext);
   const messages = [
