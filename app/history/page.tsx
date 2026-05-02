@@ -16,6 +16,12 @@ import {
   PencilLine,
   CalendarBlank,
   Equals,
+  Flame,
+  CalendarCheck,
+  ChartPieSlice,
+  Clock,
+  TextAa,
+  Medal,
 } from '@phosphor-icons/react/dist/ssr';
 import { getHistory, clearHistory, deleteHistoryRecord } from '@/lib/storage';
 import type { HistoryRecord, EvaluationType } from '@/lib/types';
@@ -25,6 +31,15 @@ import { Badge } from '@/components/ui/badge';
 import { BentoCard, BentoCardHeader } from '@/components/nnu/bento-card';
 import { RadarChartSkeleton, HistoryListItemSkeleton } from '@/components/nnu/skeletons';
 import { cn } from '@/lib/utils';
+import {
+  buildHeatmap,
+  computeAchievements,
+  computeHourBuckets,
+  computeRadarAverage,
+  computeStreak,
+  computeTopWords,
+  computeTypeBreakdown,
+} from '@/components/nnu/history/compute-insights';
 
 // Lazy-loaded charts (kept out of first paint bundle)
 const RadarChart = dynamic(
@@ -43,6 +58,31 @@ const ScoreTrendChart = dynamic(
     ),
     ssr: false,
   },
+);
+
+const HeatmapCalendar = dynamic(
+  () => import('@/components/nnu/history/heatmap-calendar').then((m) => m.HeatmapCalendar),
+  { loading: () => <div className="h-[140px] w-full animate-pulse rounded-xl bg-nnu-mist/50" />, ssr: false },
+);
+
+const TypeDonut = dynamic(
+  () => import('@/components/nnu/history/type-donut').then((m) => m.TypeDonut),
+  { loading: () => <div className="h-[160px] w-full animate-pulse rounded-xl bg-nnu-mist/50" />, ssr: false },
+);
+
+const TimeOfDayChart = dynamic(
+  () => import('@/components/nnu/history/time-of-day-chart').then((m) => m.TimeOfDayChart),
+  { loading: () => <div className="h-[140px] w-full animate-pulse rounded-xl bg-nnu-mist/50" />, ssr: false },
+);
+
+const WordCloud = dynamic(
+  () => import('@/components/nnu/history/word-cloud').then((m) => m.WordCloud),
+  { loading: () => <div className="h-[160px] w-full animate-pulse rounded-xl bg-nnu-mist/50" />, ssr: false },
+);
+
+const AchievementWall = dynamic(
+  () => import('@/components/nnu/history/achievement-wall').then((m) => m.AchievementWall),
+  { loading: () => <div className="h-[140px] w-full animate-pulse rounded-xl bg-nnu-mist/50" />, ssr: false },
 );
 
 // ============== Helpers ==============
@@ -234,10 +274,11 @@ const Sparkline: React.FC<{ values: number[] }> = ({ values }) => {
   );
 };
 
-const StatsHero: React.FC<{ stats: DashStats; sparklineValues: number[] }> = ({
-  stats,
-  sparklineValues,
-}) => {
+const StatsHero: React.FC<{
+  stats: DashStats;
+  sparklineValues: number[];
+  streak: { current: number; longest: number };
+}> = ({ stats, sparklineValues, streak }) => {
   const trendIcon =
     stats.trendDelta > 0.5 ? (
       <TrendUp weight="bold" className="w-4 h-4 text-emerald-600" />
@@ -258,21 +299,34 @@ const StatsHero: React.FC<{ stats: DashStats; sparklineValues: number[] }> = ({
       aria-label="学习概况"
       className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6"
     >
-      {/* 累计评估 */}
+      {/* 累计评估 + streak */}
       <BentoCard accent="mist" className="p-4">
         <BentoCardHeader
           icon={<ChartLineUp weight="duotone" className="w-5 h-5" />}
-          eyebrow="累计评估"
+          eyebrow="累计 / 连击"
           title=""
         />
-        <div className="mt-2 flex items-baseline gap-1.5">
+        <div className="mt-2 flex items-baseline gap-2">
           <span className="font-serif text-3xl md:text-4xl font-black text-nnu-ink tabular-nums">
             {stats.total}
           </span>
           <span className="text-xs text-nnu-sage">次</span>
+          {streak.current > 0 ? (
+            <span
+              className="ml-auto inline-flex items-center gap-1 px-2 h-6 rounded-full bg-orange-50 text-orange-600 text-[11px] font-semibold"
+              title={`当前连续 ${streak.current} 天 · 历史最长 ${streak.longest} 天`}
+            >
+              <Flame weight="fill" className="w-3 h-3" />
+              {streak.current}
+              <span className="font-normal text-orange-500/80">天</span>
+            </span>
+          ) : null}
         </div>
         <div className="mt-2 text-nnu-green/70">
           <Sparkline values={sparklineValues} />
+        </div>
+        <div className="text-[10px] text-nnu-sage mt-1">
+          最长连击 <span className="font-semibold text-nnu-ink">{streak.longest}</span> 天
         </div>
       </BentoCard>
 
@@ -598,9 +652,11 @@ const HistoryCard: React.FC<{
 const HistoryDetail = ({
   record,
   onClose,
+  historicalAverage,
 }: {
   record: HistoryRecord;
   onClose: () => void;
+  historicalAverage?: { vocabulary: number; grammar: number; coherence: number; structure: number } | null;
 }) => {
   return (
     <div
@@ -731,8 +787,24 @@ const HistoryDetail = ({
               多维度评分
             </h4>
             <div className="flex justify-center">
-              <RadarChart scores={record.result.radarScores} size="lg" />
+              <RadarChart
+                scores={record.result.radarScores}
+                historicalScores={historicalAverage ?? undefined}
+                size="lg"
+              />
             </div>
+            {historicalAverage ? (
+              <div className="mt-2 flex items-center justify-center gap-4 text-[11px] text-nnu-sage">
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="w-3 h-3 rounded-sm bg-nnu-jade/70" />
+                  本次得分
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="w-3 h-0 border-t-2 border-dashed border-gray-400" />
+                  历史平均
+                </span>
+              </div>
+            ) : null}
           </section>
         )}
       </Card>
@@ -795,6 +867,14 @@ export default function HistoryPage() {
       .sort((a, b) => a.createdAt - b.createdAt)
       .map(scoreToNumeric);
   }, [records]);
+
+  const streak = useMemo(() => computeStreak(records), [records]);
+  const heatmapCells = useMemo(() => buildHeatmap(records, 182), [records]);
+  const typeBreakdown = useMemo(() => computeTypeBreakdown(records), [records]);
+  const hourBuckets = useMemo(() => computeHourBuckets(records), [records]);
+  const topWords = useMemo(() => computeTopWords(records, 30), [records]);
+  const achievements = useMemo(() => computeAchievements(records), [records]);
+  const radarAvg = useMemo(() => computeRadarAverage(records), [records]);
 
   const trendData = useMemo(() => {
     return [...records]
@@ -915,7 +995,7 @@ export default function HistoryPage() {
           ) : (
             <>
               {/* Stats */}
-              <StatsHero stats={stats} sparklineValues={sparklineValues} />
+              <StatsHero stats={stats} sparklineValues={sparklineValues} streak={streak} />
 
               {/* Trend */}
               <BentoCard accent="green" className="p-4 md:p-5 mb-6">
@@ -938,6 +1018,88 @@ export default function HistoryPage() {
                   </div>
                 )}
               </BentoCard>
+
+              {/* Insights: heatmap */}
+              <BentoCard accent="mist" className="p-4 md:p-5 mb-6">
+                <div className="flex items-start justify-between gap-3 mb-3">
+                  <div>
+                    <div className="text-[11px] font-medium uppercase tracking-[0.12em] text-nnu-sage mb-0.5">
+                      Activity Heatmap
+                    </div>
+                    <h2 className="font-serif text-lg md:text-xl font-bold text-nnu-ink inline-flex items-center gap-2">
+                      <CalendarCheck weight="duotone" className="w-5 h-5 text-nnu-green" />
+                      学习热力图
+                    </h2>
+                  </div>
+                </div>
+                <HeatmapCalendar cells={heatmapCells} />
+              </BentoCard>
+
+              {/* Insights: donut + time-of-day */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <BentoCard accent="green" className="p-4 md:p-5">
+                  <div className="flex items-start justify-between gap-3 mb-3">
+                    <div>
+                      <div className="text-[11px] font-medium uppercase tracking-[0.12em] text-nnu-sage mb-0.5">
+                        Type Mix
+                      </div>
+                      <h2 className="font-serif text-lg font-bold text-nnu-ink inline-flex items-center gap-2">
+                        <ChartPieSlice weight="duotone" className="w-5 h-5 text-nnu-green" />
+                        题型分布
+                      </h2>
+                    </div>
+                  </div>
+                  <TypeDonut data={typeBreakdown} total={records.length} />
+                </BentoCard>
+
+                <BentoCard accent="gold" className="p-4 md:p-5">
+                  <div className="flex items-start justify-between gap-3 mb-3">
+                    <div>
+                      <div className="text-[11px] font-medium uppercase tracking-[0.12em] text-nnu-sage mb-0.5">
+                        Time of Day
+                      </div>
+                      <h2 className="font-serif text-lg font-bold text-nnu-ink inline-flex items-center gap-2">
+                        <Clock weight="duotone" className="w-5 h-5 text-nnu-gold" />
+                        时段画像
+                      </h2>
+                    </div>
+                  </div>
+                  <TimeOfDayChart buckets={hourBuckets} />
+                </BentoCard>
+              </div>
+
+              {/* Insights: achievements + words */}
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+                <BentoCard accent="sage" className="p-4 md:p-5 md:col-span-3">
+                  <div className="flex items-start justify-between gap-3 mb-3">
+                    <div>
+                      <div className="text-[11px] font-medium uppercase tracking-[0.12em] text-nnu-sage mb-0.5">
+                        Achievements
+                      </div>
+                      <h2 className="font-serif text-lg font-bold text-nnu-ink inline-flex items-center gap-2">
+                        <Medal weight="duotone" className="w-5 h-5 text-amber-500" />
+                        成就墙
+                      </h2>
+                    </div>
+                  </div>
+                  <AchievementWall achievements={achievements} />
+                </BentoCard>
+
+                <BentoCard accent="cream" className="p-4 md:p-5 md:col-span-2">
+                  <div className="flex items-start justify-between gap-3 mb-3">
+                    <div>
+                      <div className="text-[11px] font-medium uppercase tracking-[0.12em] text-nnu-sage mb-0.5">
+                        Word Cloud
+                      </div>
+                      <h2 className="font-serif text-lg font-bold text-nnu-ink inline-flex items-center gap-2">
+                        <TextAa weight="duotone" className="w-5 h-5 text-nnu-coral" />
+                        高频词云
+                      </h2>
+                    </div>
+                  </div>
+                  <WordCloud words={topWords} />
+                </BentoCard>
+              </div>
 
               {/* Filters */}
               <FilterBar
@@ -987,7 +1149,11 @@ export default function HistoryPage() {
           )}
 
           {selectedRecord && (
-            <HistoryDetail record={selectedRecord} onClose={handleCloseDetail} />
+            <HistoryDetail
+              record={selectedRecord}
+              onClose={handleCloseDetail}
+              historicalAverage={radarAvg}
+            />
           )}
         </div>
       </div>
