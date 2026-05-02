@@ -19,6 +19,12 @@ export interface RadarChartProps {
   };
   dimensions?: RadarDimensions; // 新增：动态维度支持
   historicalAverage?: RadarDimensions; // 新增：历史平均数据
+  historicalScores?: {
+    vocabulary: number;
+    grammar: number;
+    coherence: number;
+    structure: number;
+  }; // 新增：传统 scores 模式下的历史平均叠加
   size?: 'sm' | 'md' | 'lg';
   onDimensionClick?: (dimension: string, index: number) => void; // 新增：点击交互
 }
@@ -36,12 +42,13 @@ const getSizeHeight = (size: 'sm' | 'md' | 'lg'): number => {
   }
 };
 
-export const RadarChart: React.FC<RadarChartProps> = ({ 
-  scores, 
+export const RadarChart: React.FC<RadarChartProps> = ({
+  scores,
   dimensions,
   historicalAverage,
+  historicalScores,
   size = 'md',
-  onDimensionClick 
+  onDimensionClick,
 }) => {
   const height = getSizeHeight(size);
 
@@ -57,13 +64,19 @@ export const RadarChart: React.FC<RadarChartProps> = ({
       { subject: dimensions.labels[3], current: dimensions.dim4, historical: historicalAverage?.dim4, fullMark: 100 },
     ];
   } else if (scores) {
-    // 向后兼容：使用传统 scores
+    // 向后兼容：使用传统 scores（可选叠加 historicalScores）
+    const h = historicalScores;
     data = [
-      { subject: '语义准确', current: scores.vocabulary, fullMark: 100 },
-      { subject: '逻辑连贯', current: scores.grammar, fullMark: 100 },
-      { subject: '词汇丰富', current: scores.coherence, fullMark: 100 },
-      { subject: '句式多样', current: scores.structure, fullMark: 100 },
-      { subject: '语境契合', current: Math.round((scores.vocabulary + scores.coherence) / 2), fullMark: 100 },
+      { subject: '语义准确', current: scores.vocabulary, historical: h?.vocabulary, fullMark: 100 },
+      { subject: '逻辑连贯', current: scores.grammar, historical: h?.grammar, fullMark: 100 },
+      { subject: '词汇丰富', current: scores.coherence, historical: h?.coherence, fullMark: 100 },
+      { subject: '句式多样', current: scores.structure, historical: h?.structure, fullMark: 100 },
+      {
+        subject: '语境契合',
+        current: Math.round((scores.vocabulary + scores.coherence) / 2),
+        historical: h ? Math.round((h.vocabulary + h.coherence) / 2) : undefined,
+        fullMark: 100,
+      },
     ];
   } else {
     // 默认空数据
@@ -105,7 +118,7 @@ export const RadarChart: React.FC<RadarChartProps> = ({
           />
           
           {/* 历史平均数据（灰色虚线） */}
-          {historicalAverage && (
+          {(historicalAverage || historicalScores) && (
             <Radar
               name="历史平均"
               dataKey="historical"
