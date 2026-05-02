@@ -58,6 +58,15 @@ export const PromptLibraryPanel: React.FC<PromptLibraryPanelProps> = ({
     setTimeout(() => setAppliedId(null), 2000);
   };
 
+  React.useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
+
   return (
     <>
       {/* Floating tab on the left edge */}
@@ -83,16 +92,27 @@ export const PromptLibraryPanel: React.FC<PromptLibraryPanelProps> = ({
         <CaretRight className="w-4 h-4" weight="bold" />
       </button>
 
+      {/* Backdrop — sibling of drawer so it sits above the page nav (z-50) */}
+      <button
+        type="button"
+        aria-label="关闭"
+        tabIndex={open ? 0 : -1}
+        onClick={() => setOpen(false)}
+        className={cn(
+          "fixed inset-0 z-[55] bg-black/35 backdrop-blur-[2px] transition-opacity print:hidden",
+          open ? "opacity-100" : "opacity-0 pointer-events-none",
+        )}
+      />
+
       {/* Drawer */}
       <div
         className={cn(
-          "fixed inset-y-0 left-0 z-40 w-full sm:w-[440px] max-w-full",
+          "fixed inset-y-0 left-0 z-[60] w-full sm:w-[440px] max-w-full",
           "transition-transform duration-300 ease-out print:hidden",
           open ? "translate-x-0" : "-translate-x-full",
         )}
         role={open ? "dialog" : undefined}
         aria-modal={open ? true : undefined}
-        aria-hidden={!open}
         aria-label="提示词库"
         {...(open ? {} : { inert: true })}
       >
@@ -193,17 +213,6 @@ export const PromptLibraryPanel: React.FC<PromptLibraryPanelProps> = ({
             })}
           </div>
         </div>
-
-        {/* Backdrop */}
-        <button
-          type="button"
-          aria-label="关闭"
-          onClick={() => setOpen(false)}
-          className={cn(
-            "fixed inset-0 -z-10 bg-black/30 transition-opacity",
-            open ? "opacity-100" : "opacity-0 pointer-events-none",
-          )}
-        />
       </div>
     </>
   );
