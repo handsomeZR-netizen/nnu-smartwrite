@@ -119,7 +119,7 @@ async function extractFullMdFromZip(zipBytes: ArrayBuffer): Promise<string | nul
 async function pollPreciseTask(
   batchId: string,
   token: string,
-  maxAttempts = 24,
+  maxAttempts = 18,
   intervalMs = 3000,
 ): Promise<{ markdown?: string; status: string; error?: string }> {
   for (let i = 0; i < maxAttempts; i++) {
