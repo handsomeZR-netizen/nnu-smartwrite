@@ -1,5 +1,12 @@
 @import "tailwindcss";
 
+/* Explicit content scan paths so the webpack-based prod build on Vercel
+   picks up classes from every source file (Turbopack auto-detect catches
+   them locally but webpack PostCSS pipeline misses components/). */
+@source "../app/**/*.{ts,tsx}";
+@source "../components/**/*.{ts,tsx}";
+@source "../lib/**/*.{ts,tsx}";
+
 :root {
   --background: #F9F7F2;
   --foreground: #171717;
